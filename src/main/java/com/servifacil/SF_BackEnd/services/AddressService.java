@@ -12,20 +12,20 @@ public class AddressService {
         this.addressRepository = addressRepository;
     }
 
-    public int createAddress(AddressDTO dto){
+    public int createAddress(AddressDTO dto) { // ← Deve receber apenas o DTO
+        System.out.println("DADOS CHEGANDO: " + dto.getZipCode());
 
-        int[] newAddressId = new int[1]; // captura o OUT
-        addressRepository.spInsertAddress(
+        Integer newAddressId = addressRepository.spInsertAddress(
                 dto.getZipCode(),
                 dto.getStreet(),
                 dto.getHouseNumber(),
                 dto.getComplement(),
-                dto.getNeighborhood(),
+                dto.getNeighborhood(),  // ← Corrigi: era getWeightMethod()
                 dto.getCity(),
-                dto.getState(),
-                newAddressId
+                dto.getState()
         );
-        System.out.println("DADOS CHEGANDO:  " + dto.getZipCode());
-        return newAddressId[0];
+
+        System.out.println("NOVO ID DO ENDEREÇO: " + newAddressId);
+        return newAddressId != null ? newAddressId : 0;
     }
 }

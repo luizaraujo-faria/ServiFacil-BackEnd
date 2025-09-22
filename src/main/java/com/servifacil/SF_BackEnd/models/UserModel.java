@@ -1,10 +1,13 @@
 package com.servifacil.SF_BackEnd.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import org.springframework.boot.context.properties.bind.DefaultValue;
+import jakarta.validation.constraints.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.constraints.br.CPF;
 
-import java.util.Date;
+import java.time.*;
 
 @Entity
 @Table(name = "tbUsers")
@@ -16,48 +19,75 @@ public class UserModel {
     private int userId;
 
     @Column(name = "User_Name")
-    @NotBlank
+    @Size(min = 2, max = 150, message = "Nome deve conter entre 2 e 100 caracteres!")
+    @NotBlank(message = "Nome é obrigatório!")
     private String userName;
 
     @Column(name = "Email")
-    @NotBlank
+    @Email(message = "Insira um email válido!")
+    @Size(max = 150, message = "Email deve conter no máximo 150 caracteres!")
+    @NotBlank(message = "Email é obrigatório!")
     private String email;
 
-    @Column(name = "User_Password")
-    @NotBlank
+    @Column(name = "User_Password", length = 150)
+    @Size(min = 8, message = "A senha deve conter mínimo 8 caracteres!")
+    @NotBlank(message = "Senha é obrigatória!")
     private String userPassword;
 
     @Column(name = "CPF")
-    @NotBlank
+    @Size(min = 11, max = 15, message = "CPF inválido!")
+    @NotBlank(message = "CPF é obrigatório!")
     private String cpf;
 
     @Column(name = "CNPJ")
+    @CNPJ(message = "CNPJ inválido!")
     private String cnpj;
 
     @Column(name = "Telephone")
-    @NotBlank
+    @Pattern(regexp = "^\\(?(\\d{2})\\)?[\\s-]?\\d{4,5}[\\s-]?\\d{4}$",
+            message = "Telefone deve estar no formato (XX) XXXXX-XXXX")
+    @NotBlank(message = "Número de telefone é obrigatório!")
     private String telephone;
 
     @Column(name = "Birth_Date")
-    @NotBlank
-    private Date birthDate = new Date();
+    @Past(message = "Insira uma data válida!")
+    @NotNull(message = "Data de nascimento é obrigatória!")
+    private LocalDate birthDate;
 
     @Column(name = "RG")
-    @NotBlank
+    @NotBlank(message = "RG é obrigatório!")
     private String rg;
 
     @Column(name = "User_Type")
-    private UserType userType;
+    private UserType userType = UserType.CLIENT;
 
     @Column(name = "Profession")
-    @NotBlank
     private String profession;
+
+//    @OneToOne
+//    @JoinColumn(name = "Address_ID")
+//    private AddressModel address;
 
     @Column(name = "Address_ID")
     private int addressId;
 
-    enum UserType {
-        CLIENT, PROFESSIONAl;
+    @Column(name = "Created_At")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    public enum UserType {
+        CLIENT("Cliente"),
+        PROFESSIONAL("Profissional");
+
+        private final String displayName;
+
+        UserType(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 
     // GETTERS & SETTERS
@@ -71,7 +101,7 @@ public class UserModel {
     public void setEmail(String email){ this.email = email; }
 
     public String getUserPassword(){ return this.userPassword; }
-    public void setUserPassword(){ this.userPassword = userPassword; }
+    public void setUserPassword(String userPassword){ this.userPassword = userPassword; }
 
     public String getCpf(){ return this.cpf; }
     public void setCpf(String cpf){ this.cpf = cpf; }
@@ -82,8 +112,8 @@ public class UserModel {
     public String getTelephone(){ return this.telephone; }
     public void setTelephone(String telephone){ this.telephone = telephone; }
 
-    public Date getBirthDate(){ return this.birthDate; }
-    public void setBirthDate(Date birthDate){ this.birthDate = birthDate; }
+    public LocalDate getBirthDate(){ return this.birthDate; }
+    public void setBirthDate(LocalDate birthDate){ this.birthDate = birthDate; }
 
     public String getRg(){ return this.rg; }
     public void setRg(String rg){ this.rg = rg; }
@@ -94,6 +124,12 @@ public class UserModel {
     public String getProfession(){ return this.profession; }
     public void setProfession(String profession){ this.profession = profession; }
 
+//    public AddressModel getAddress(){ return this.address; }
+//    public void setAddress(AddressModel address){ this.address = address; }
+
     public int getAddressId(){ return this.addressId; }
     public void setAddressId(int addressId){ this.addressId = addressId; }
+
+    public LocalDateTime getCreatedAt(){ return this.createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt){ this.createdAt = createdAt; }
 }
