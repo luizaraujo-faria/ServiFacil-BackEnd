@@ -15,20 +15,20 @@ public class ServiceService {
         this.repository = repository;
     }
 
-    public ServiceModel criarServico(ServiceModel servico) {
-        return repository.save(servico);
+    public ServiceModel criarServico(ServiceModel service) {
+        return repository.save(service);
     }
 
     public List<ServiceModel> listarServicos() {
         return repository.findAll();
     }
 
-    public List<ServiceModel> buscarPorNome(String nome) {
-        return repository.findByTitleContainingIgnoreCase(nome);
+    public List<ServiceModel> buscarPorNome(String name) {
+        return repository.findByTitleContainingIgnoreCase(name);
     }
 
-    public List<ServiceModel> buscarPorCategoria(int categoriaId) {
-        return repository.findByCategoryId(categoriaId);
+    public List<ServiceModel> buscarPorCategoria(int categoryId) {
+        return repository.findByCategoryId(categoryId);
     }
 
     public List<ServiceModel> buscarPorProfissional(int profissionalId) {

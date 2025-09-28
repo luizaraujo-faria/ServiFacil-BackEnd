@@ -17,8 +17,8 @@ public class ServiceController {
     }
 
     @PostMapping("/criar")
-    public ServiceModel criar(@RequestBody ServiceModel servico) {
-        return service.criarServico(servico);
+    public ServiceModel criar(@RequestBody ServiceModel service) {
+        return service.criarServico(service);
     }
 
     @GetMapping("/listar")
@@ -27,8 +27,8 @@ public class ServiceController {
     }
 
     @GetMapping("/buscar/nome/{nome}")
-    public List<ServiceModel> buscarPorNome(@PathVariable String nome) {
-        return service.buscarPorNome(nome);
+    public List<ServiceModel> buscarPorNome(@PathVariable String name) {
+        return service.buscarPorNome(name);
     }
 
     @GetMapping("/buscar/categoria/{id}")
@@ -37,8 +37,8 @@ public class ServiceController {
     }
 
     @PutMapping("/editar/{id}")
-    public ServiceModel editar(@PathVariable int id, @RequestBody ServiceModel servico) {
-        return service.editarServico(id, servico);
+    public ServiceModel editar(@PathVariable int id, @RequestBody ServiceModel service) {
+        return service.editarServico(id, service);
     }
 
     @DeleteMapping("/excluir/{id}")
