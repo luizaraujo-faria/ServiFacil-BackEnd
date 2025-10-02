@@ -1,7 +1,10 @@
 package com.servifacil.SF_BackEnd.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 @Entity
 @Table(name = "tbServices")
@@ -17,7 +20,7 @@ public class ServiceModel {
     private String title;
 
     @Column(name = "Price")
-    @NotBlank
+    @Positive(message = "Preço deve ser maior que 0")
     private double price;
 
     @Column(name = "Details")

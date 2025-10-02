@@ -1,6 +1,8 @@
 package com.servifacil.SF_BackEnd.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
@@ -19,7 +21,8 @@ public class AssessmentModel {
     private int clientId;
 
     @Column(name = "Score")
-    @NotBlank
+    @Min(value = 1, message = "Score deve ser no mínimo 1")
+    @Max(value = 5, message = "Score deve ser no máximo 5")
     private int score;
 
     @Column(name = "Comments")
