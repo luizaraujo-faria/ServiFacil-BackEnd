@@ -2,6 +2,8 @@ package com.servifacil.SF_BackEnd.controllers;
 
 import com.servifacil.SF_BackEnd.models.ServiceModel;
 import com.servifacil.SF_BackEnd.services.ServiceService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,32 +19,33 @@ public class ServiceController {
     }
 
     @PostMapping("/criar")
-    public ServiceModel criar(@RequestBody ServiceModel service) {
-        return service.criarServico(service);
+    public ResponseEntity<ServiceModel> criar(@RequestBody ServiceModel payload) {
+        ServiceModel criado = this.service.criarServico(payload);
+        return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
     @GetMapping("/listar")
     public List<ServiceModel> listar() {
-        return service.listarServicos();
+        return this.service.listarServicos();
     }
 
     @GetMapping("/buscar/nome/{nome}")
-    public List<ServiceModel> buscarPorNome(@PathVariable String name) {
-        return service.buscarPorNome(name);
+    public List<ServiceModel> buscarPorNome(@PathVariable("nome") String nome) {
+        return this.service.buscarPorNome(nome);
     }
 
     @GetMapping("/buscar/categoria/{id}")
-    public List<ServiceModel> buscarPorCategoria(@PathVariable int id) {
-        return service.buscarPorCategoria(id);
+    public List<ServiceModel> buscarPorCategoria(@PathVariable("id") int id) {
+        return this.service.buscarPorCategoria(id);
     }
 
     @PutMapping("/editar/{id}")
-    public ServiceModel editar(@PathVariable int id, @RequestBody ServiceModel service) {
-        return service.editarServico(id, service);
+    public ServiceModel editar(@PathVariable("id") int id, @RequestBody ServiceModel payload) {
+        return this.service.editarServico(id, payload);
     }
 
     @DeleteMapping("/excluir/{id}")
-    public void excluir(@PathVariable int id) {
-        service.excluirServico(id);
+    public void excluir(@PathVariable("id") int id) {
+        this.service.excluirServico(id);
     }
 }
