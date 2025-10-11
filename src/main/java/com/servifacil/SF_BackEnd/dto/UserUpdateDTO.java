@@ -1,72 +1,91 @@
 package com.servifacil.SF_BackEnd.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
 
-public class UserCreateRequest {
+public class UserUpdateDTO {
+
     // Dados do usuário
-    @NotBlank(message = "Nome é obrigatório")
+    @Column(name = "User_Name")
+    @Size(min = 2, max = 100, message = "Nome deve conter entre 2 e 100 caracteres!")
     private String userName;
 
-    @NotBlank(message = "Email é obrigatório")
-    @Email(message = "Email deve ser válido")
+    @Column(name = "Email")
+    @Email(message = "Insira um email válido!")
+    @Size(max = 150, message = "Email deve conter no máximo 150 caracteres!")
     private String email;
 
-    @NotBlank(message = "Senha é obrigatória")
-    @Size(min = 8, message = "Senha deve ter pelo menos 8 caracteres")
+    @Column(name = "User_Password", length = 150)
+    @Size(min = 8, message = "A senha deve conter mínimo 8 caracteres!")
     private String userPassword;
 
-    @NotBlank(message = "CPF é obrigatório")
+    @Column(name = "CPF")
+//    @CPF(message = "CPF inválido!")
+    @Size(min = 11, max = 15, message = "CPF inválido!")
     private String cpf;
 
-    @NotBlank(message = "RG é obrigatório")
-    private String rg;
-
-    @NotBlank(message = "Telefone é obrigatório")
-    private String telephone;
-
+    @Column(name = "CNPJ")
+//    @CNPJ(message = "CNPJ inválido!")
     private String cnpj;
 
-    @NotNull(message = "Data de nascimento é obrigatória")
-    @Past(message = "Data deve ser no passado")
+    @Column(name = "Telephone")
+    @Pattern(regexp = "^\\(?(\\d{2})\\)?[\\s-]?\\d{4,5}[\\s-]?\\d{4}$",
+            message = "Telefone deve estar no formato (XX) XXXXX-XXXX")
+    private String telephone;
+
+    @Column(name = "Birth_Date")
+    @Past(message = "Insira uma data válida!")
     private LocalDate birthDate;
 
-    private String userType = "CLIENT";
+    @Column(name = "RG")
+    @NotBlank(message = "RG é obrigatório!")
+    private String rg;
+
+    @Column(name = "User_Type")
+    private String userType = "Cliente";
+
+    @Column(name = "Profession")
     private String profession;
 
     // Dados do endereço
-    @NotBlank(message = "CEP é obrigatório")
+    @Column(name = "Zip_Code")
+    @Size(min = 9, max = 10, message = "CEP deve conter no mínmo 9 e no máximo 10 caractéres!")
     private String zipCode;
 
-    @NotBlank(message = "Rua é obrigatória")
+    @Column(name = "Street")
+    @Size(min = 2, max = 100, message = "Nome da rua deve conter entre 2 e 100 caractéres!")
     private String street;
 
-    @NotBlank(message = "Número é obrigatório")
+    @Column(name = "House_Number")
+    @Size(min = 1, max = 10, message = "Número da casa deve conter entre 1 e 10 caractéres!")
     private String houseNumber;
 
+    @Column(name = "Complement")
+    @Size(min = 1, max = 25, message = "Complemento deve conter entre 1 e 25 caractéres!")
     private String complement;
 
-    @NotBlank(message = "Bairro é obrigatório")
+    @Size(min = 2, max = 80, message = "Bairro deve conter entre 2 e 80 caractéres!")
     private String neighborhood;
 
-    @NotBlank(message = "Cidade é obrigatória")
+    @Size(min = 2, max = 80, message = "Cidade deve conter entre 2 e 80 caractéres!")
     private String city;
 
-    @NotBlank(message = "Estado é obrigatório")
     @Size(min = 2, max = 2, message = "Estado deve ter 2 caracteres")
     private String state;
 
     // Construtor padrão (obrigatório para desserialização JSON)
-    public UserCreateRequest() {
+    public UserUpdateDTO() {
     }
 
     // Construtor com todos os campos
-    public UserCreateRequest(String userName, String email, String userPassword,
-                             String cpf, String rg, String telephone, String cnpj,
-                             LocalDate birthDate, String userType, String profession,
-                             String zipCode, String street, String houseNumber,
-                             String complement, String neighborhood, String city,
-                             String state) {
+    public UserUpdateDTO(String userName, String email, String userPassword,
+                          String cpf, String rg, String telephone, String cnpj,
+                          LocalDate birthDate, String userType, String profession,
+                          String zipCode, String street, String houseNumber,
+                          String complement, String neighborhood, String city,
+                          String state) {
         this.userName = userName;
         this.email = email;
         this.userPassword = userPassword;
