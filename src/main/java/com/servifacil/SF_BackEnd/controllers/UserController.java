@@ -1,60 +1,149 @@
 package com.servifacil.SF_BackEnd.controllers;
 
-import com.servifacil.SF_BackEnd.dto.UserCreateRequest;
+import com.servifacil.SF_BackEnd.dto.UserAddressDTO;
+import com.servifacil.SF_BackEnd.dto.UserLoginDTO;
+import com.servifacil.SF_BackEnd.dto.UserUpdateDTO;
 import com.servifacil.SF_BackEnd.models.UserModel;
+import com.servifacil.SF_BackEnd.responses.LoginResponse;
+import com.servifacil.SF_BackEnd.security.JwtUtil;
 import com.servifacil.SF_BackEnd.services.UserService;
+import com.servifacil.SF_BackEnd.exceptions.ApiException;
+import com.servifacil.SF_BackEnd.responses.EntityResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.apache.catalina.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    public final UserService userService;
+    @Autowired
+    private UserService userService;
 
-    public UserController(UserService userService){
-        this.userService = userService;
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, String>> createUser(@Valid @RequestBody UserAddressDTO request,
+                                                          BindingResult bindingResult) {
+
+        // Se houver erros de validação, lança ApiException
+        if (bindingResult.hasErrors()) {
+            String errors = bindingResult.getFieldErrors()
+                    .stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining(", "));
+            throw new ApiException(errors, HttpStatus.BAD_REQUEST);
+        }
+
+        userService.createUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Usuário criado com sucesso!"));
     }
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateRequest request) {
-        try {
-            UserModel createdUser = userService.createUser(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse<UserModel>> userLogin(@Valid @RequestBody UserLoginDTO request,
+                                                         BindingResult bindingResult) {
+
+        // Se houver erros de validação, lança ApiException
+        if (bindingResult.hasErrors()) {
+            String errors = bindingResult.getFieldErrors()
+                    .stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining(", "));
+            throw new ApiException(errors, HttpStatus.BAD_REQUEST);
         }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorResponse("Dados inválidos: " + e.getMessage())
-            );
-        }
-        catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorResponse(e.getMessage())
-            );
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ErrorResponse("Erro interno no servidor")
-            );
-        }
+
+        UserModel user = userService.userLogin(request);
+
+        String token = jwtUtil.generateToken(user.getUserId() ,user.getEmail());
+
+        LoginResponse<UserModel> response = new LoginResponse<>(
+                true,
+                "Login realizado com sucesso!",
+                token
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // Classe interna para padronizar respostas de erro
+    @GetMapping("/{id}")
+    public ResponseEntity<EntityResponse<?>> getUser(@PathVariable int id,
+//                                                     BindingResult bindingResult,
+                                                     HttpServletRequest servletReq){
 
-    public static class ErrorResponse {
-        private String message;
-        private long timestamp;
+//        if (bindingResult.hasErrors()) {
+//            String errors = bindingResult.getFieldErrors()
+//                    .stream()
+//                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+//                    .collect(Collectors.joining(", "));
+//            throw new ApiException(errors, HttpStatus.BAD_REQUEST);
+//        }
 
-        public ErrorResponse(String message) {
-            this.message = message;
-            this.timestamp = System.currentTimeMillis();
+        int idFromToken = (int) servletReq.getAttribute("userId");
+
+        if(id != idFromToken){
+            EntityResponse<?> invalidId = new EntityResponse<>(
+                    false,
+                    "Você não tem permissão para buscar outro usuário!",
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(invalidId);
         }
 
-        // Getters
-        public String getMessage() { return message; }
-        public long getTimestamp() { return timestamp; }
+        UserModel user = userService.getUser(id);
+
+        EntityResponse<UserModel> response = new EntityResponse<>(
+                true,
+                "Usuário carregado com sucesso!",
+                user
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/update/{id}")
+    public ResponseEntity<EntityResponse<?>> userUpdate(@PathVariable int id,
+                                                        @Valid @RequestBody UserUpdateDTO request,
+                                                        BindingResult bindingResult,
+                                                        HttpServletRequest servletReq){
+
+        // Se houver erros de validação, lança ApiException
+        if (bindingResult.hasErrors()) {
+            String errors = bindingResult.getFieldErrors()
+                    .stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining(", "));
+            throw new ApiException(errors, HttpStatus.BAD_REQUEST);
+        }
+
+        int idFromToken = (int) servletReq.getAttribute("userId");
+
+        if(id != idFromToken){
+            EntityResponse<?> invalidId = new EntityResponse<>(
+                    false,
+                    "Você não tem permissão para atualizar outro usuário!",
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(invalidId);
+        }
+
+        userService.updateUser(id, request);
+
+        EntityResponse<?> response = new EntityResponse<>(
+                true,
+                "Dados atualizados com sucesso!",
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

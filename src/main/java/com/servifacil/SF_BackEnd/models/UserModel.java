@@ -1,16 +1,15 @@
 package com.servifacil.SF_BackEnd.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CNPJ;
-import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.*;
 
 @Entity
-@Table(name = "tbUsers")
+@Table(name = "tb_users")
 public class UserModel {
 
     @Id
@@ -30,6 +29,7 @@ public class UserModel {
     private String email;
 
     @Column(name = "User_Password", length = 150)
+    @JsonIgnore
     @Size(min = 8, message = "A senha deve conter mínimo 8 caracteres!")
     @NotBlank(message = "Senha é obrigatória!")
     private String userPassword;
@@ -58,26 +58,24 @@ public class UserModel {
     @NotBlank(message = "RG é obrigatório!")
     private String rg;
 
+    @Convert(converter = UserTypeConverter.class)
     @Column(name = "User_Type")
-    private UserType userType = UserType.CLIENT;
+    private UserType userType = UserType.Cliente;
 
     @Column(name = "Profession")
     private String profession;
 
-//    @OneToOne
-//    @JoinColumn(name = "Address_ID")
-//    private AddressModel address;
-
-    @Column(name = "Address_ID")
-    private int addressId;
+    @OneToOne
+    @JoinColumn(name = "Address_ID")
+    private AddressModel address;
 
     @Column(name = "Created_At")
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     public enum UserType {
-        CLIENT("Cliente"),
-        PROFESSIONAL("Profissional");
+        Cliente("Cliente"),
+        Profissional("Profissional");
 
         private final String displayName;
 
@@ -87,6 +85,17 @@ public class UserModel {
 
         public String getDisplayName() {
             return displayName;
+        }
+
+        // 🔄 Converte texto do banco para Enum
+        public static UserType fromDisplayName(String dbValue) {
+            if (dbValue == null) return null;
+            for (UserType type : values()) {
+                if (type.displayName.equalsIgnoreCase(dbValue)) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Tipo de usuário inválido: " + dbValue);
         }
     }
 
@@ -124,11 +133,8 @@ public class UserModel {
     public String getProfession(){ return this.profession; }
     public void setProfession(String profession){ this.profession = profession; }
 
-//    public AddressModel getAddress(){ return this.address; }
-//    public void setAddress(AddressModel address){ this.address = address; }
-
-    public int getAddressId(){ return this.addressId; }
-    public void setAddressId(int addressId){ this.addressId = addressId; }
+    public AddressModel getAddress(){ return this.address; }
+    public void setAddress(AddressModel address){ this.address = address; }
 
     public LocalDateTime getCreatedAt(){ return this.createdAt; }
     public void setCreatedAt(LocalDateTime createdAt){ this.createdAt = createdAt; }
