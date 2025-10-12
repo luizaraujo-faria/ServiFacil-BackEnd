@@ -1,5 +1,6 @@
 package com.servifacil.SF_BackEnd.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.br.CNPJ;
@@ -42,6 +43,7 @@ public class UserAddressDTO {
     private String telephone;
 
     @Column(name = "Birth_Date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Past(message = "Insira uma data válida!")
     @NotNull(message = "Data de nascimento é obrigatória!")
     private LocalDate birthDate;

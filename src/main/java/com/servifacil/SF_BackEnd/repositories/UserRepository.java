@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
@@ -25,7 +26,7 @@ public interface UserRepository extends JpaRepository<UserModel, Integer> {
             @Param("vRG") String rg,
             @Param("vTelephone") String telephone,
             @Param("vCNPJ") String cnpj,
-            @Param("vBirth_Date") java.sql.Date birthDate,
+            @Param("vBirth_Date") LocalDate birthDate,
             @Param("vUser_Type") String userType,
             @Param("vProfession") String profession,
             @Param("vZip_Code") String zipCode,
@@ -47,7 +48,7 @@ public interface UserRepository extends JpaRepository<UserModel, Integer> {
             @Param("vRG") String rg,
             @Param("vTelephone") String telephone,
             @Param("vCNPJ") String cnpj,
-            @Param("vBirth_Date") java.sql.Date birthDate,
+            @Param("vBirth_Date") LocalDate birthDate,
             @Param("vUser_Type") String userType,
             @Param("vProfession") String profession,
             @Param("vZip_Code") String zipCode,

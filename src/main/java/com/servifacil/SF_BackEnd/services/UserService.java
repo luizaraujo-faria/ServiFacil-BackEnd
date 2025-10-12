@@ -29,19 +29,14 @@ public class UserService {
     public void createUser(UserAddressDTO request) {
 
         String email = request.getEmail().trim().toLowerCase();
-        System.out.println("Email recebido: [" + email + "]");
 
         if(userRepository.existsByEmail(email)){
-            System.out.println("Email já cadastrado!");
             throw new ApiException("Email já cadastrado!", HttpStatus.CONFLICT);
         }
 
-        // CONVERTER LocalDate para java.sql.Date
-        java.sql.Date birthDate = java.sql.Date.valueOf(request.getBirthDate());
-        // ✅ CONVERSÃO USANDO O ENUM DA USERMODEL
-//        UserModel.UserType userType = UserModel.UserType.fromString(request.getUserType());
-//        byte userTypeByte = userType.getCode();
-        System.out.println("UserType convertido: " + request.getUserType());
+        if(!MergeUtils.validBirthDate(request.getBirthDate())){
+            throw new ApiException("É necessário ser maior de idade!", HttpStatus.BAD_REQUEST);
+        }
 
         // CRIPTOGRAFIA DA SENHA
         request.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
@@ -54,7 +49,7 @@ public class UserService {
                 request.getRg(),
                 request.getTelephone(),
                 request.getCnpj(),
-                birthDate,
+                request.getBirthDate(),
                 request.getUserType(),
                 request.getProfession(),
                 request.getZipCode(),
@@ -71,7 +66,6 @@ public class UserService {
     public UserModel userLogin(UserLoginDTO request){
 
         String normalizedEmail = request.getEmail().trim().toLowerCase();
-        System.out.println("Email recebido: " + normalizedEmail);
 
         UserModel user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
@@ -94,21 +88,26 @@ public class UserService {
     }
 
     @Transactional
-    public UserModel updateUser(int paramId, UserUpdateDTO request){
-
-        System.out.println("ID RECEBIDO: " + paramId);
+    public void updateUser(int paramId, UserUpdateDTO request){
 
         UserModel existingUser = userRepository.findById(paramId)
                 .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
+
+        String email = request.getEmail().trim().toLowerCase();
+
+        if(userRepository.existsByEmail(email)){
+            throw new ApiException("Email indisponível, use outro!", HttpStatus.CONFLICT);
+        }
 
         if (request == null){
             throw new ApiException("Ao menos um campo deve ser preenchido!", HttpStatus.BAD_REQUEST);
         }
 
-        request.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
-        java.sql.Date birthDate = java.sql.Date.valueOf(request.getBirthDate());
+        if(!MergeUtils.validBirthDate(request.getBirthDate())){
+            throw new ApiException("É necessário ser maior de idade!", HttpStatus.BAD_REQUEST);
+        }
 
-//        MergeUtils.mergeNonNullFields(request, existingUser);
+        request.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
 
         userRepository.spUpdateUser(
                 paramId,
@@ -119,7 +118,7 @@ public class UserService {
                 request.getRg(),
                 request.getTelephone(),
                 request.getCnpj(),
-                birthDate,
+                request.getBirthDate(),
                 request.getUserType(),
                 request.getProfession(),
                 request.getZipCode(),
@@ -130,9 +129,5 @@ public class UserService {
                 request.getCity(),
                 request.getState()
         );
-
-        System.out.println("USUARIO ATUALIZADO: " + existingUser);
-
-        return existingUser;
     }
 }

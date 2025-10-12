@@ -1,5 +1,6 @@
 package com.servifacil.SF_BackEnd.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -50,6 +51,7 @@ public class UserModel {
     private String telephone;
 
     @Column(name = "Birth_Date")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     @Past(message = "Insira uma data válida!")
     @NotNull(message = "Data de nascimento é obrigatória!")
     private LocalDate birthDate;

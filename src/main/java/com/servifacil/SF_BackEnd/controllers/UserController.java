@@ -11,7 +11,6 @@ import com.servifacil.SF_BackEnd.exceptions.ApiException;
 import com.servifacil.SF_BackEnd.responses.EntityResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,7 +33,7 @@ public class UserController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> createUser(@Valid @RequestBody UserAddressDTO request,
+    public ResponseEntity<EntityResponse<?>> createUser(@Valid @RequestBody UserAddressDTO request,
                                                           BindingResult bindingResult) {
 
         // Se houver erros de validação, lança ApiException
@@ -46,7 +46,14 @@ public class UserController {
         }
 
         userService.createUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Usuário criado com sucesso!"));
+
+        EntityResponse<?> createResponse = new EntityResponse<>(
+                true,
+                "Usuário cadastrado com sucesso!",
+                request.getEmail()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createResponse);
     }
 
     @PostMapping("/login")
@@ -110,7 +117,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/update/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<EntityResponse<?>> userUpdate(@PathVariable int id,
                                                         @Valid @RequestBody UserUpdateDTO request,
                                                         BindingResult bindingResult,

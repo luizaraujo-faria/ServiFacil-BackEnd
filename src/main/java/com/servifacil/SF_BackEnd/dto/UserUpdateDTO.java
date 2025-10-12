@@ -1,5 +1,6 @@
 package com.servifacil.SF_BackEnd.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
@@ -36,6 +37,7 @@ public class UserUpdateDTO {
     private String telephone;
 
     @Column(name = "Birth_Date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Past(message = "Insira uma data válida!")
     private LocalDate birthDate;
 
