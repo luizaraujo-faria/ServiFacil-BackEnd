@@ -1,5 +1,6 @@
-package com.servifacil.SF_BackEnd.models;
+package com.servifacil.SF_BackEnd.converters;
 
+import com.servifacil.SF_BackEnd.models.UserModel;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

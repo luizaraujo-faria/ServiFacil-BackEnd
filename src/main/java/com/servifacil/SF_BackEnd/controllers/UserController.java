@@ -71,7 +71,7 @@ public class UserController {
 
         UserModel user = userService.userLogin(request);
 
-        String token = jwtUtil.generateToken(user.getUserId() ,user.getEmail());
+        String token = jwtUtil.generateToken(user.getUserId(), user.getUserType(), user.getEmail());
 
         LoginResponse<UserModel> response = new LoginResponse<>(
                 true,
@@ -95,7 +95,11 @@ public class UserController {
 //            throw new ApiException(errors, HttpStatus.BAD_REQUEST);
 //        }
 
-        int idFromToken = (int) servletReq.getAttribute("userId");
+        Integer idFromToken = (Integer) servletReq.getAttribute("userId");
+
+        if (idFromToken == null) {
+            throw new ApiException("Usuário não autenticado ou token inválido!", HttpStatus.UNAUTHORIZED);
+        }
 
         if(id != idFromToken){
             EntityResponse<?> invalidId = new EntityResponse<>(
@@ -132,7 +136,11 @@ public class UserController {
             throw new ApiException(errors, HttpStatus.BAD_REQUEST);
         }
 
-        int idFromToken = (int) servletReq.getAttribute("userId");
+        Integer idFromToken = (Integer) servletReq.getAttribute("userId");
+
+        if (idFromToken == null) {
+            throw new ApiException("Usuário não autenticado ou token inválido!", HttpStatus.UNAUTHORIZED);
+        }
 
         if(id != idFromToken){
             EntityResponse<?> invalidId = new EntityResponse<>(

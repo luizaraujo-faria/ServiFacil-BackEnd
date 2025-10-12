@@ -2,6 +2,7 @@ package com.servifacil.SF_BackEnd.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.servifacil.SF_BackEnd.converters.UserTypeConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.annotations.CreationTimestamp;

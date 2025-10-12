@@ -1,5 +1,6 @@
 package com.servifacil.SF_BackEnd.security;
 
+import com.servifacil.SF_BackEnd.models.UserModel;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -18,11 +19,12 @@ public class JwtUtil {
     private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 horas
 
-    public String generateToken(int userId,String email) {
+    public String generateToken(int userId, UserModel.UserType userType, String email) {
 
         return Jwts.builder()
                 .setSubject(email)
                 .claim("userId", userId)
+                .claim("userType", userType)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -32,6 +34,11 @@ public class JwtUtil {
     public int extractId(String token){
         Claims claims = extractAllClaims(token);
         return claims.get("userId", Integer.class);
+    }
+
+    public String extractUserType(String token){
+        Claims claims = extractAllClaims(token);
+        return claims.get("userType", String.class);
     }
 
     public String extractEmail(String token) {

@@ -2,9 +2,10 @@ package com.servifacil.SF_BackEnd.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "tbCategories")
+@Table(name = "tb_categories")
 public class CategoryModel {
 
     @Id
@@ -13,10 +14,12 @@ public class CategoryModel {
     private int categoryId;
 
     @Column(name = "Category")
-    @NotBlank
+    @NotBlank(message = "Categoria é obrigatória!")
+    @Size(min = 2, max = 80, message = "Categoria deve conter entre 2 e 80 caractéres!")
     private String category;
 
     @Column(name = "Details")
+    @Size(min = 2, max = 150, message = "detalhes da categoria deve conter entre 2 e 150 caractéres!")
     private String details;
 
     // GETTERS & SETTERS
