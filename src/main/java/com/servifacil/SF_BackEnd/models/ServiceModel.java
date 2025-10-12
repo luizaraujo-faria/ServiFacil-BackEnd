@@ -33,7 +33,7 @@ public class ServiceModel {
     @Column(name = "Service_Status")
     private ServiceStatus serviceStatus;
 
-    enum ServiceStatus {
+    public enum ServiceStatus {
         ACTIVE, INACTIVE;
     }
 
