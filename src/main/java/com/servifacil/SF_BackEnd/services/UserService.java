@@ -85,6 +85,15 @@ public class UserService {
     }
 
     @Transactional
+    public UserModel getUser(int userId){
+
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
+
+        return user;
+    }
+
+    @Transactional
     public UserModel updateUser(int paramId, UserUpdateDTO request){
 
         System.out.println("ID RECEBIDO: " + paramId);
@@ -97,9 +106,33 @@ public class UserService {
         }
 
         request.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
+        java.sql.Date birthDate = java.sql.Date.valueOf(request.getBirthDate());
 
-        MergeUtils.mergeNonNullFields(request, existingUser);
+//        MergeUtils.mergeNonNullFields(request, existingUser);
 
-        return userRepository.save(existingUser);
+        userRepository.spUpdateUser(
+                paramId,
+                request.getUserName(),
+                request.getEmail(),
+                request.getUserPassword(),
+                request.getCpf(),
+                request.getRg(),
+                request.getTelephone(),
+                request.getCnpj(),
+                birthDate,
+                request.getUserType(),
+                request.getProfession(),
+                request.getZipCode(),
+                request.getStreet(),
+                request.getHouseNumber(),
+                request.getComplement(),
+                request.getNeighborhood(),
+                request.getCity(),
+                request.getState()
+        );
+
+        System.out.println("USUARIO ATUALIZADO: " + existingUser);
+
+        return existingUser;
     }
 }

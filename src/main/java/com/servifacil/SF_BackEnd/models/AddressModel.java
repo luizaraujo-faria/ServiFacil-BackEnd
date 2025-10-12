@@ -1,5 +1,6 @@
 package com.servifacil.SF_BackEnd.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,6 +12,7 @@ public class AddressModel {
     @Id
     @Column(name = "Address_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private int addressID;
 
     @Column(name = "Zip_Code")

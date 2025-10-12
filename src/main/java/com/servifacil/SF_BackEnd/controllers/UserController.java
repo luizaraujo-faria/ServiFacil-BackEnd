@@ -11,6 +11,7 @@ import com.servifacil.SF_BackEnd.exceptions.ApiException;
 import com.servifacil.SF_BackEnd.responses.EntityResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,11 +75,46 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<EntityResponse<?>> getUser(@PathVariable int id,
+//                                                     BindingResult bindingResult,
+                                                     HttpServletRequest servletReq){
+
+//        if (bindingResult.hasErrors()) {
+//            String errors = bindingResult.getFieldErrors()
+//                    .stream()
+//                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+//                    .collect(Collectors.joining(", "));
+//            throw new ApiException(errors, HttpStatus.BAD_REQUEST);
+//        }
+
+        int idFromToken = (int) servletReq.getAttribute("userId");
+
+        if(id != idFromToken){
+            EntityResponse<?> invalidId = new EntityResponse<>(
+                    false,
+                    "Você não tem permissão para buscar outro usuário!",
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(invalidId);
+        }
+
+        UserModel user = userService.getUser(id);
+
+        EntityResponse<UserModel> response = new EntityResponse<>(
+                true,
+                "Usuário carregado com sucesso!",
+                user
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PatchMapping("/update/{id}")
     public ResponseEntity<EntityResponse<?>> userUpdate(@PathVariable int id,
-                                                        @Valid @RequestBody UserAddressDTO request,
+                                                        @Valid @RequestBody UserUpdateDTO request,
                                                         BindingResult bindingResult,
-                                                        HttpServletRequest serverletReq){
+                                                        HttpServletRequest servletReq){
 
         // Se houver erros de validação, lança ApiException
         if (bindingResult.hasErrors()) {
@@ -89,11 +125,18 @@ public class UserController {
             throw new ApiException(errors, HttpStatus.BAD_REQUEST);
         }
 
-        int idFromToken = (int) serverletReq.getAttribute("userId");
+        int idFromToken = (int) servletReq.getAttribute("userId");
 
         if(id != idFromToken){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            EntityResponse<?> invalidId = new EntityResponse<>(
+                    false,
+                    "Você não tem permissão para atualizar outro usuário!",
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(invalidId);
         }
+
+        userService.updateUser(id, request);
 
         EntityResponse<?> response = new EntityResponse<>(
                 true,

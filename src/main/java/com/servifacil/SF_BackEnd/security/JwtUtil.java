@@ -16,7 +16,7 @@ public class JwtUtil {
 
     private final String SECRET_KEY = "Servi_Facil_Secret_2025@@308_Codifica"; // 🔒 use algo forte e seguro
     private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hora
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 1 hora
 
     public String generateToken(int userId,String email) {
 

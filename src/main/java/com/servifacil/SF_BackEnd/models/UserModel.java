@@ -1,5 +1,6 @@
 package com.servifacil.SF_BackEnd.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -28,6 +29,7 @@ public class UserModel {
     private String email;
 
     @Column(name = "User_Password", length = 150)
+    @JsonIgnore
     @Size(min = 8, message = "A senha deve conter mínimo 8 caracteres!")
     @NotBlank(message = "Senha é obrigatória!")
     private String userPassword;

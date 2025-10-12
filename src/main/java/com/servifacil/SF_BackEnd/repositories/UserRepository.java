@@ -36,4 +36,26 @@ public interface UserRepository extends JpaRepository<UserModel, Integer> {
             @Param("vCity") String city,
             @Param("vState") String state
     );
+
+    @Procedure(procedureName = "spUpdateUser")
+    void spUpdateUser(
+            @Param("vUser_ID") int userId,
+            @Param("vUser_Name") String userName,
+            @Param("vEmail") String email,
+            @Param("vUser_Password") String userPassword,
+            @Param("vCPF") String cpf,
+            @Param("vRG") String rg,
+            @Param("vTelephone") String telephone,
+            @Param("vCNPJ") String cnpj,
+            @Param("vBirth_Date") java.sql.Date birthDate,
+            @Param("vUser_Type") String userType,
+            @Param("vProfession") String profession,
+            @Param("vZip_Code") String zipCode,
+            @Param("vStreet") String street,
+            @Param("vHouse_Number") String houseNumber,
+            @Param("vComplement") String complement,
+            @Param("vNeighborhood") String neighborhood,
+            @Param("vCity") String city,
+            @Param("vState") String state
+    );
 }
