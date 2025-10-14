@@ -9,13 +9,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.br.CNPJ;
 
 import java.time.*;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_users")
 public class UserModel {
 
     @Id
-    @Column(name = "User_Id")
+    @Column(name = "User_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
 
@@ -75,6 +76,9 @@ public class UserModel {
     @Column(name = "Created_At")
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "professional")
+    private List<ServiceModel> services;
 
     public enum UserType {
         Cliente("Cliente"),

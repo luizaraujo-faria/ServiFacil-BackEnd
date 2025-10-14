@@ -69,10 +69,10 @@ public class JwtFilter extends OncePerRequestFilter {
             request.setAttribute("userType", user.getUserType().name());
 
             // Se não for profissional → 403
-            if (!"PROFISSIONAL".equalsIgnoreCase(user.getUserType().name())) {
-                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Acesso permitido apenas a usuários profissionais");
-                return;
-            }
+//            if (!"PROFISSIONAL".equalsIgnoreCase(user.getUserType().name())) {
+//                sendError(response, HttpServletResponse.SC_FORBIDDEN, "Acesso permitido apenas a usuários profissionais");
+//                return;
+//            }
 
             // Configura autenticação
             List<SimpleGrantedAuthority> authorities = List.of(

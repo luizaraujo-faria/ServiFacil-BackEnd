@@ -88,9 +88,9 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(int paramId, UserUpdateDTO request){
+    public void updateUser(int userId, UserUpdateDTO request){
 
-        UserModel existingUser = userRepository.findById(paramId)
+        UserModel existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
 
         String email = request.getEmail().trim().toLowerCase();
@@ -110,7 +110,7 @@ public class UserService {
         request.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
 
         userRepository.spUpdateUser(
-                paramId,
+                userId,
                 request.getUserName(),
                 request.getEmail(),
                 request.getUserPassword(),

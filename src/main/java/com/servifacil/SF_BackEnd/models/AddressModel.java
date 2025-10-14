@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+
 @Entity
 @Table(name = "tb_addresses")
 public class AddressModel {
@@ -45,6 +47,9 @@ public class AddressModel {
     @OneToOne
     @JoinColumn(name = "State_ID")
     private StateModel stateID;
+
+//    @OneToOne(mappedBy = "address")
+//    private UserModel user;
 
     // GETTERS e SETTERS
 

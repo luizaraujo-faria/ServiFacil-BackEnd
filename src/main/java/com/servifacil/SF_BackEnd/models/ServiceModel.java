@@ -36,7 +36,7 @@ public class ServiceModel {
     private ServiceStatus serviceStatus = ServiceStatus.Ativo;
 
     @ManyToOne
-    @JoinColumn(name = "User_ID")
+    @JoinColumn(name = "Professional_ID")
     private UserModel professional;
 
     @OneToOne

@@ -1,8 +1,11 @@
 package com.servifacil.SF_BackEnd.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 @Entity
 @Table(name = "tb_categories")
@@ -11,6 +14,7 @@ public class CategoryModel {
     @Id
     @Column(name = "Category_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private int categoryId;
 
     @Column(name = "Category")
@@ -21,6 +25,9 @@ public class CategoryModel {
     @Column(name = "Details")
     @Size(min = 2, max = 150, message = "detalhes da categoria deve conter entre 2 e 150 caractéres!")
     private String details;
+
+    @OneToMany(mappedBy = "category")
+    private List<ServiceModel> services;
 
     // GETTERS & SETTERS
 
