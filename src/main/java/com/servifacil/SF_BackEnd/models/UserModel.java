@@ -80,6 +80,10 @@ public class UserModel {
     @OneToMany(mappedBy = "professional")
     private List<ServiceModel> services;
 
+    @OneToMany(mappedBy = "client")
+    private List<AppointmentModel> appointments;
+
+
     public enum UserType {
         Cliente("Cliente"),
         Profissional("Profissional");

@@ -1,8 +1,8 @@
 package com.servifacil.SF_BackEnd.services;
 
-import com.servifacil.SF_BackEnd.dto.UserAddressDTO;
+import com.servifacil.SF_BackEnd.dto.CreateUserDTO;
 import com.servifacil.SF_BackEnd.dto.UserLoginDTO;
-import com.servifacil.SF_BackEnd.dto.UserUpdateDTO;
+import com.servifacil.SF_BackEnd.dto.EditUserDTO;
 import com.servifacil.SF_BackEnd.models.UserModel;
 import com.servifacil.SF_BackEnd.repositories.UserRepository;
 import com.servifacil.SF_BackEnd.exceptions.ApiException;
@@ -26,7 +26,7 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void createUser(UserAddressDTO request) {
+    public void createUser(CreateUserDTO request) {
 
         String email = request.getEmail().trim().toLowerCase();
 
@@ -88,7 +88,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(int userId, UserUpdateDTO request){
+    public void updateUser(int userId, EditUserDTO request){
 
         UserModel existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));

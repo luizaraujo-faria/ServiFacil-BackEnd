@@ -3,12 +3,10 @@ package com.servifacil.SF_BackEnd.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
-import org.hibernate.validator.constraints.br.CNPJ;
-import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
 
-public class UserAddressDTO {
+public class CreateUserDTO {
     // Dados do usuário
     @Column(name = "User_Name")
     @Size(min = 2, max = 100, message = "Nome deve conter entre 2 e 100 caracteres!")
@@ -92,16 +90,16 @@ public class UserAddressDTO {
     private String state;
 
     // Construtor padrão (obrigatório para desserialização JSON)
-    public UserAddressDTO() {
+    public CreateUserDTO() {
     }
 
     // Construtor com todos os campos
-    public UserAddressDTO(String userName, String email, String userPassword,
-                          String cpf, String rg, String telephone, String cnpj,
-                          LocalDate birthDate, String userType, String profession,
-                          String zipCode, String street, String houseNumber,
-                          String complement, String neighborhood, String city,
-                          String state) {
+    public CreateUserDTO(String userName, String email, String userPassword,
+                         String cpf, String rg, String telephone, String cnpj,
+                         LocalDate birthDate, String userType, String profession,
+                         String zipCode, String street, String houseNumber,
+                         String complement, String neighborhood, String city,
+                         String state) {
         this.userName = userName;
         this.email = email;
         this.userPassword = userPassword;

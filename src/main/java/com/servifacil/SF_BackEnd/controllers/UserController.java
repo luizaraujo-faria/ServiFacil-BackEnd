@@ -1,8 +1,8 @@
 package com.servifacil.SF_BackEnd.controllers;
 
-import com.servifacil.SF_BackEnd.dto.UserAddressDTO;
+import com.servifacil.SF_BackEnd.dto.CreateUserDTO;
 import com.servifacil.SF_BackEnd.dto.UserLoginDTO;
-import com.servifacil.SF_BackEnd.dto.UserUpdateDTO;
+import com.servifacil.SF_BackEnd.dto.EditUserDTO;
 import com.servifacil.SF_BackEnd.models.UserModel;
 import com.servifacil.SF_BackEnd.responses.LoginResponse;
 import com.servifacil.SF_BackEnd.security.JwtUtil;
@@ -18,8 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 
-import javax.swing.text.html.parser.Entity;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,7 +31,7 @@ public class UserController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<EntityResponse<?>> createUser(@Valid @RequestBody UserAddressDTO request,
+    public ResponseEntity<EntityResponse<?>> createUser(@Valid @RequestBody CreateUserDTO request,
                                                           BindingResult bindingResult) {
 
         // Se houver erros de validação, lança ApiException
@@ -123,7 +121,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<EntityResponse<?>> userUpdate(@PathVariable int id,
-                                                        @Valid @RequestBody UserUpdateDTO request,
+                                                        @Valid @RequestBody EditUserDTO request,
                                                         BindingResult bindingResult,
                                                         HttpServletRequest servletReq){
 

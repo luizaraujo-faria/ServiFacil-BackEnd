@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
-public class UserUpdateDTO {
+public class EditUserDTO {
 
     // Dados do usuário
     @Column(name = "User_Name")
@@ -78,16 +78,16 @@ public class UserUpdateDTO {
     private String state;
 
     // Construtor padrão (obrigatório para desserialização JSON)
-    public UserUpdateDTO() {
+    public EditUserDTO() {
     }
 
     // Construtor com todos os campos
-    public UserUpdateDTO(String userName, String email, String userPassword,
-                          String cpf, String rg, String telephone, String cnpj,
-                          LocalDate birthDate, String userType, String profession,
-                          String zipCode, String street, String houseNumber,
-                          String complement, String neighborhood, String city,
-                          String state) {
+    public EditUserDTO(String userName, String email, String userPassword,
+                       String cpf, String rg, String telephone, String cnpj,
+                       LocalDate birthDate, String userType, String profession,
+                       String zipCode, String street, String houseNumber,
+                       String complement, String neighborhood, String city,
+                       String state) {
         this.userName = userName;
         this.email = email;
         this.userPassword = userPassword;

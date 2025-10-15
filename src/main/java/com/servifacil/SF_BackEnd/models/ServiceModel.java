@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_services")
@@ -42,6 +43,10 @@ public class ServiceModel {
     @OneToOne
     @JoinColumn(name = "Category_ID")
     private CategoryModel category;
+
+    @OneToMany(mappedBy = "service")
+    private List<AppointmentModel> appointments;
+
 
     public enum ServiceStatus {
         Ativo("Ativo"),

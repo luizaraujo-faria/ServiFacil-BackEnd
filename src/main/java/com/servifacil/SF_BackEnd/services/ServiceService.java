@@ -1,7 +1,7 @@
 package com.servifacil.SF_BackEnd.services;
 
 import com.servifacil.SF_BackEnd.dto.EditServiceDTO;
-import com.servifacil.SF_BackEnd.dto.ServiceDTO;
+import com.servifacil.SF_BackEnd.dto.CreateServiceDTO;
 import com.servifacil.SF_BackEnd.exceptions.ApiException;
 import com.servifacil.SF_BackEnd.models.CategoryModel;
 import com.servifacil.SF_BackEnd.models.ServiceModel;
@@ -51,7 +51,7 @@ public class ServiceService {
     }
 
     @Transactional
-    public int createService(int userId, ServiceDTO request) {
+    public int createService(int userId, CreateServiceDTO request) {
 
         int newService = serviceRepository.spInsertService(
                 userId,

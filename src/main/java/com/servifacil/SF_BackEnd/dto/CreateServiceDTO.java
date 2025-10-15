@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 
-public class ServiceDTO {
+public class CreateServiceDTO {
 
     @Column(name = "Title")
     @NotBlank(message = "Título é obrigatório!")

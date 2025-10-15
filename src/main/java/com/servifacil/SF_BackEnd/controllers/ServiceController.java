@@ -1,9 +1,8 @@
 package com.servifacil.SF_BackEnd.controllers;
 
 import com.servifacil.SF_BackEnd.dto.EditServiceDTO;
-import com.servifacil.SF_BackEnd.dto.ServiceDTO;
+import com.servifacil.SF_BackEnd.dto.CreateServiceDTO;
 import com.servifacil.SF_BackEnd.exceptions.ApiException;
-import com.servifacil.SF_BackEnd.models.CategoryModel;
 import com.servifacil.SF_BackEnd.models.ServiceModel;
 import com.servifacil.SF_BackEnd.responses.EntityResponse;
 import com.servifacil.SF_BackEnd.services.ServiceService;
@@ -17,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,7 +57,7 @@ public class ServiceController {
     @PreAuthorize("hasRole('PROFISSIONAL')")
     @PostMapping("/{id}")
     public ResponseEntity<EntityResponse<?>> createService(@PathVariable int id,
-                                      @Valid @RequestBody ServiceDTO request,
+                                      @Valid @RequestBody CreateServiceDTO request,
                                       BindingResult bindingResult,
                                       HttpServletRequest servletReq) {
 
