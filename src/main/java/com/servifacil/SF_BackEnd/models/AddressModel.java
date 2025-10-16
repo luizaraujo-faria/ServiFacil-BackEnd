@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -47,6 +49,11 @@ public class AddressModel {
     @OneToOne
     @JoinColumn(name = "State_ID")
     private StateModel stateID;
+
+    @Column(name = "Created_At")
+    @CreationTimestamp
+    @JsonIgnore
+    private LocalDateTime createdAt;
 
 //    @OneToOne(mappedBy = "address")
 //    private UserModel user;

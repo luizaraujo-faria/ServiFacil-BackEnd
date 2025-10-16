@@ -38,7 +38,7 @@ public class AppointmentModel {
     private LocalDateTime endDate;
 
     @Convert(converter = AppointmentStatusConverter.class)
-    @Column(name = "A_Status")
+    @Column(name = "Ap_Status")
     private AppointmentStatus appointmentStatus = AppointmentStatus.Pendente;
 
     public enum AppointmentStatus {

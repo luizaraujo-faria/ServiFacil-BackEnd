@@ -63,65 +63,124 @@ public class AppointmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createResponse);
     }
 
-//    // Buscar todos os agendamentos
-//    @GetMapping
-//    public ResponseEntity<List<AppointmentModel>> getAllAppointments() {
-//        List<AppointmentModel> appointments = appointmentService.getAllAppointments();
-//        return ResponseEntity.ok(appointments);
-//    }
-//
-//    // Buscar agendamento por ID
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> getAppointmentById(@PathVariable int id) {
-//        Optional<AppointmentModel> appointment = appointmentService.getAppointmentById(id);
-//        if (appointment.isPresent()) {
-//            return ResponseEntity.ok(appointment.get());
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    // Buscar agendamentos por cliente
-//    @GetMapping("/client/{clientId}")
-//    public ResponseEntity<List<AppointmentModel>> getAppointmentsByClient(@PathVariable int clientId) {
-//        List<AppointmentModel> appointments = appointmentService.getAppointmentsByClient(clientId);
-//        return ResponseEntity.ok(appointments);
-//    }
-//
-//    // Buscar agendamentos por serviço
-//    @GetMapping("/service/{serviceId}")
-//    public ResponseEntity<List<AppointmentModel>> getAppointmentsByService(@PathVariable int serviceId) {
-//        List<AppointmentModel> appointments = appointmentService.getAppointmentsByService(serviceId);
-//        return ResponseEntity.ok(appointments);
-//    }
+    // Buscar todos os agendamentos
+    @GetMapping("/user/{id}/{apStatus}")
+    public ResponseEntity<EntityResponse<?>> getAppointmentsByUser(@PathVariable int id,
+                                                                    @PathVariable String apStatus,
+                                                                    HttpServletRequest servletReq) {
+
+        Integer idFromToken = (Integer) servletReq.getAttribute("userId");
+
+        if(idFromToken == null){
+            throw new ApiException("Usuário não autenticado ou token inválido!", HttpStatus.UNAUTHORIZED);
+        }
+
+        if(id != idFromToken){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new EntityResponse<>(false, "Você não tem permissão para ver agendamentos de outro usuário!", null));
+        }
+
+        List<AppointmentModel> userAppointments = appointmentService.getAppointmentsByUser(id, apStatus);
+
+        EntityResponse<List<AppointmentModel>> getResponse = new EntityResponse<>(
+                true,
+                "Agendamentos do usuário: " + id + "carregados com sucesso!",
+                userAppointments
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(getResponse);
+    }
+
+    // Buscar agendamentos por serviço
+    @GetMapping("/service/{id}/{serviceId}/{apStatus}")
+    public ResponseEntity<EntityResponse<?>> getAppointmentsByService(@PathVariable int id,
+                                                                      @PathVariable int serviceId,
+                                                                      @PathVariable String apStatus,
+                                                                      HttpServletRequest servletReq) {
+
+        Integer idFromToken = (Integer) servletReq.getAttribute("userId");
+
+        if(idFromToken == null){
+            throw new ApiException("Usuário não autenticado ou token inválido!", HttpStatus.UNAUTHORIZED);
+        }
+
+        if(id != idFromToken){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new EntityResponse<>(false, "Você não tem permissão para ver agendamentos de serviços outro profissional!", null));
+        }
+
+        List<AppointmentModel> serviceAppointments = appointmentService.getAppointmentsByService(id, serviceId, apStatus);
+
+        EntityResponse<List<AppointmentModel>> getResponse = new EntityResponse<>(
+                true,
+                "Agendamentos do serviço: " + id + "carregados com sucesso!",
+                serviceAppointments
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(getResponse);
+    }
+
+    // Cancelar agendamento
+    @PatchMapping("/cancel/{id}/{appointmentId}")
+    public ResponseEntity<EntityResponse<?>> cancelAppointment(@PathVariable int id,
+                                                               @PathVariable int appointmentId,
+                                                               HttpServletRequest servletReq) {
+
+        Integer idFromToken = (Integer) servletReq.getAttribute("userId");
+
+        if(idFromToken == null){
+            throw new ApiException("Usuário não autenticado ou token inválido!", HttpStatus.UNAUTHORIZED);
+        }
+
+        if(id != idFromToken){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new EntityResponse<>(false, "Você não tem permissão para cancelar agendamentos de outro usuário!", null));
+        }
+
+        int canceledAppointment = appointmentService.cancelAppointment(id, appointmentId);
+
+        EntityResponse<Integer> cancelResponse = new EntityResponse<>(
+                true,
+                "Agendamento: " + canceledAppointment + " cancelado com sucesso!",
+                canceledAppointment
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(cancelResponse);
+    }
+
+    // Completar agendamento
+    @PatchMapping("/conclude/{id}/{appointmentId}")
+    public ResponseEntity<EntityResponse<?>> concludeAppointment(@PathVariable int id,
+                                                                 @PathVariable int appointmentId,
+                                                                 HttpServletRequest servletReq) {
+
+        Integer idFromToken = (Integer) servletReq.getAttribute("userId");
+
+        if(idFromToken == null){
+            throw new ApiException("Usuário não autenticado ou token inválido!", HttpStatus.UNAUTHORIZED);
+        }
+
+        if(id != idFromToken){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new EntityResponse<>(false, "Você não tem permissão para concluir agendamentos de outro usuário!", null));
+        }
+
+        int concludedAppointment = appointmentService.concludeAppointment(id, appointmentId);
+
+        EntityResponse<Integer> cancelResponse = new EntityResponse<>(
+                true,
+                "Agendamento: " + concludedAppointment + " concluído com sucesso!",
+                concludedAppointment
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(cancelResponse);
+    }
 //
 //    // Atualizar agendamento
 //    @PutMapping("/{id}")
 //    public ResponseEntity<?> updateAppointment(@PathVariable int id, @RequestBody AppointmentDTO appointmentDTO) {
 //        try {
 //            AppointmentModel appointment = appointmentService.updateAppointment(id, appointmentDTO);
-//            return ResponseEntity.ok(appointment);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
-//
-//    // Cancelar agendamento
-//    @PutMapping("/{id}/cancel")
-//    public ResponseEntity<?> cancelAppointment(@PathVariable int id) {
-//        try {
-//            AppointmentModel appointment = appointmentService.cancelAppointment(id);
-//            return ResponseEntity.ok(appointment);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
-//
-//    // Completar agendamento
-//    @PutMapping("/{id}/complete")
-//    public ResponseEntity<?> completeAppointment(@PathVariable int id) {
-//        try {
-//            AppointmentModel appointment = appointmentService.completeAppointment(id);
 //            return ResponseEntity.ok(appointment);
 //        } catch (RuntimeException e) {
 //            return ResponseEntity.badRequest().body(e.getMessage());

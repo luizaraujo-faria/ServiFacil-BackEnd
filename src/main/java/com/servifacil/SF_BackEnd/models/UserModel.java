@@ -75,6 +75,7 @@ public class UserModel {
 
     @Column(name = "Created_At")
     @CreationTimestamp
+    @JsonIgnore
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "professional")

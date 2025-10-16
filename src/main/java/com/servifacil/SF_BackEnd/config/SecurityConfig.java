@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
                         .requestMatchers("/api/services/getall", "/api/services/filter/{category}").authenticated()
-                        .requestMatchers("/api/services/**").hasRole("PROFISSIONAL")
+                        .requestMatchers("/api/services/**", "/api/appointments/service/{id}/{serviceId}").hasRole("PROFISSIONAL")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

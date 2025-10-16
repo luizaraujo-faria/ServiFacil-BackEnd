@@ -2,12 +2,18 @@ package com.servifacil.SF_BackEnd.services;
 
 import com.servifacil.SF_BackEnd.dto.CreateAppointmentDTO;
 import com.servifacil.SF_BackEnd.exceptions.ApiException;
+import com.servifacil.SF_BackEnd.models.AppointmentModel;
 import com.servifacil.SF_BackEnd.models.ServiceModel;
+import com.servifacil.SF_BackEnd.models.UserModel;
 import com.servifacil.SF_BackEnd.repositories.AppointmentRepository;
 import com.servifacil.SF_BackEnd.repositories.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AppointmentService {
@@ -43,31 +49,72 @@ public class AppointmentService {
                 clientId,
                 serviceId,
                 request.getStartDate(),
-                request.getEndDate()
+                request.getEndDate(),
+                AppointmentModel.AppointmentStatus.Pendente.getDisplayName()
         );
 
         return newAppointment;
     }
 
-//    // Buscar todos os agendamentos
-//    public List<AppointmentModel> getAllAppointments() {
-//        return appointmentRepository.findAll();
-//    }
-//
-//    // Buscar agendamentos por cliente
-//    public List<AppointmentModel> getAppointmentsByClient(int clientId) {
-//        return appointmentRepository.findByClientId(clientId);
-//    }
-//
-//    // Buscar agendamentos por serviço
-//    public List<AppointmentModel> getAppointmentsByService(int serviceId) {
-//        return appointmentRepository.findByServiceId(serviceId);
-//    }
-//
-//    // Buscar agendamento por ID
-//    public Optional<AppointmentModel> getAppointmentById(int appointmentId) {
-//        return appointmentRepository.findById(appointmentId);
-//    }
+    // Buscar todos os agendamentos
+    @Transactional
+    public List<AppointmentModel> getAppointmentsByUser(int clientId, String apStatus) {
+
+        List<AppointmentModel> userAppointments = appointmentRepository.findAllAppointmentByUserByStatus(clientId, apStatus);
+        if(userAppointments == null || userAppointments.isEmpty()){
+            throw new ApiException("Nenhum agendamento encontrado!", HttpStatus.NOT_FOUND);
+        }
+
+        return userAppointments;
+    }
+
+    // Buscar agendamentos por serviço
+    public List<AppointmentModel> getAppointmentsByService(int professionalId, int serviceId, String apStatus) {
+
+        ServiceModel existingService = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new ApiException("Serviço não encontrado!", HttpStatus.NOT_FOUND));
+
+        if (existingService.getProfessional().getUserId() != professionalId) {
+            throw new ApiException("Este serviço pertence a outro profissional!", HttpStatus.CONFLICT);
+        }
+
+        List<AppointmentModel> serviceAppointments = appointmentRepository.findAllAppointmentByServiceByStatus(serviceId, apStatus);
+        if (serviceAppointments == null || serviceAppointments.isEmpty()) {
+            throw new ApiException("Nenhum agendamento encontrado para este serviço!", HttpStatus.NOT_FOUND);
+        }
+
+        return serviceAppointments;
+    }
+
+    // Cancelar agendamento
+    public int cancelAppointment(int clientId, int appointmentId) {
+
+        AppointmentModel existingAppointment = appointmentRepository.findById(appointmentId)
+                .filter(a -> "Pendente".equalsIgnoreCase(a.getAppointmentStatus().getDisplayName()))
+                .orElseThrow(() -> new ApiException("Agendamento não encontrado!", HttpStatus.NOT_FOUND));
+
+        if(existingAppointment.getClient().getUserId() != clientId){
+            throw new ApiException("Este agendamento não pertence a você!", HttpStatus.CONFLICT);
+        }
+
+        return appointmentRepository.updateAppointmentStatus(appointmentId, AppointmentModel.AppointmentStatus.Cancelado.getDisplayName());
+    }
+
+    // Completar agendamento
+    public int concludeAppointment(int clientId, int appointmentId) {
+
+        AppointmentModel existingAppointment = appointmentRepository.findById(appointmentId)
+                .filter(a -> "Pendente".equalsIgnoreCase(a.getAppointmentStatus().getDisplayName()))
+                .orElseThrow(() -> new ApiException("Agendamento não encontrado!", HttpStatus.NOT_FOUND));
+
+        if(existingAppointment.getClient().getUserId() != clientId){
+            throw new ApiException("Este agendamento não pertence a você!", HttpStatus.CONFLICT);
+        }
+
+        return appointmentRepository.updateAppointmentStatus(appointmentId, AppointmentModel.AppointmentStatus.Concluido.getDisplayName());
+    }
+
+
 //
 //    // Atualizar agendamento
 //    public AppointmentModel updateAppointment(int appointmentId, AppointmentDTO appointmentDTO) {
@@ -103,33 +150,4 @@ public class AppointmentService {
 //        return appointmentRepository.save(appointment);
 //    }
 //
-//    // Cancelar agendamento
-//    public AppointmentModel cancelAppointment(int appointmentId) {
-//        Optional<AppointmentModel> appointmentOpt = appointmentRepository.findById(appointmentId);
-//        if (appointmentOpt.isEmpty()) {
-//            throw new RuntimeException("Agendamento não encontrado!");
-//        }
-//
-//        AppointmentModel appointment = appointmentOpt.get();
-//
-//        // Validar se pode cancelar (apenas agendamentos pendentes)
-//        if (appointment.getAppointmentStatus() != AppointmentModel.AppointmentStatus.PENDING) {
-//            throw new RuntimeException("Somente agendamentos pendentes podem ser cancelados!");
-//        }
-//
-//        appointment.setAppointmentStatus(AppointmentModel.AppointmentStatus.CANCELLED);
-//        return appointmentRepository.save(appointment);
-//    }
-//
-//    // Completar agendamento
-//    public AppointmentModel completeAppointment(int appointmentId) {
-//        Optional<AppointmentModel> appointmentOpt = appointmentRepository.findById(appointmentId);
-//        if (appointmentOpt.isEmpty()) {
-//            throw new RuntimeException("Agendamento não encontrado!");
-//        }
-//
-//        AppointmentModel appointment = appointmentOpt.get();
-//        appointment.setAppointmentStatus(AppointmentModel.AppointmentStatus.COMPLETED);
-//        return appointmentRepository.save(appointment);
-//    }
 }
