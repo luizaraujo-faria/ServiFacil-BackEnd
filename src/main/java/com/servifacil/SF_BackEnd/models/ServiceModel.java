@@ -47,6 +47,8 @@ public class ServiceModel {
     @OneToMany(mappedBy = "service")
     private List<AppointmentModel> appointments;
 
+    @OneToMany(mappedBy = "service")
+    private List<AssessmentModel> assessments;
 
     public enum ServiceStatus {
         Ativo("Ativo"),

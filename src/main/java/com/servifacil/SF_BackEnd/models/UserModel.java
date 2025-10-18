@@ -84,6 +84,9 @@ public class UserModel {
     @OneToMany(mappedBy = "client")
     private List<AppointmentModel> appointments;
 
+    @OneToMany(mappedBy = "client")
+    private List<AssessmentModel> assessments;
+
 
     public enum UserType {
         Cliente("Cliente"),
@@ -99,7 +102,7 @@ public class UserModel {
             return displayName;
         }
 
-        // 🔄 Converte texto do banco para Enum
+        // Converte texto do banco para Enum
         public static UserType fromDisplayName(String dbValue) {
             if (dbValue == null) return null;
             for (UserType type : values()) {
