@@ -20,7 +20,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @GetMapping
+    @GetMapping("/getall")
     public ResponseEntity<EntityResponse<?>> listCategories(){
 
         List<CategoryModel> categories = categoryService.listCategories();
