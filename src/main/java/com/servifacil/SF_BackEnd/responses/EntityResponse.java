@@ -4,19 +4,19 @@ import java.time.LocalDateTime;
 
 public class EntityResponse<T> {
 
-    private boolean sucess;
+    private boolean success;
     private String message;
     private T data;
     private LocalDateTime timestamp;
 
-    public EntityResponse(boolean sucess, String message, T data){
-        this.sucess = sucess;
+    public EntityResponse(boolean success, String message, T data){
+        this.success = success;
         this.message = message;
         this.data = data;
         this.timestamp = LocalDateTime.now();
     }
 
-    public boolean isSucess(){ return sucess; }
+    public boolean isSuccess(){ return success; }
 
     public String getMessage(){ return message; }
 

@@ -4,19 +4,19 @@ import java.time.LocalDateTime;
 
 public class LoginResponse<T> {
 
-    private boolean sucess;
+    private boolean success;
     private String message;
     private String token;
     private LocalDateTime timestamp;
 
-    public LoginResponse(boolean sucess, String message, String token){
-        this.sucess = sucess;
+    public LoginResponse(boolean success, String message, String token){
+        this.success = success;
         this.message = message;
         this.token = token;
         this.timestamp = LocalDateTime.now();
     }
 
-    public boolean isSucess(){ return sucess; }
+    public boolean isSuccess(){ return success; }
 
     public String getMessage(){ return message; }
 
