@@ -1,18 +1,22 @@
 package com.servifacil.SF_BackEnd.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.servifacil.SF_BackEnd.converters.UserTypeConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.br.CNPJ;
 
 import java.time.*;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_users")
 public class UserModel {
 
     @Id
-    @Column(name = "User_Id")
+    @Column(name = "User_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
 
@@ -28,6 +32,7 @@ public class UserModel {
     private String email;
 
     @Column(name = "User_Password", length = 150)
+    @JsonIgnore
     @Size(min = 8, message = "A senha deve conter mínimo 8 caracteres!")
     @NotBlank(message = "Senha é obrigatória!")
     private String userPassword;
@@ -48,6 +53,7 @@ public class UserModel {
     private String telephone;
 
     @Column(name = "Birth_Date")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     @Past(message = "Insira uma data válida!")
     @NotNull(message = "Data de nascimento é obrigatória!")
     private LocalDate birthDate;
@@ -69,7 +75,18 @@ public class UserModel {
 
     @Column(name = "Created_At")
     @CreationTimestamp
+    @JsonIgnore
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "professional")
+    private List<ServiceModel> services;
+
+    @OneToMany(mappedBy = "client")
+    private List<AppointmentModel> appointments;
+
+    @OneToMany(mappedBy = "client")
+    private List<AssessmentModel> assessments;
+
 
     public enum UserType {
         Cliente("Cliente"),
@@ -85,7 +102,7 @@ public class UserModel {
             return displayName;
         }
 
-        // 🔄 Converte texto do banco para Enum
+        // Converte texto do banco para Enum
         public static UserType fromDisplayName(String dbValue) {
             if (dbValue == null) return null;
             for (UserType type : values()) {

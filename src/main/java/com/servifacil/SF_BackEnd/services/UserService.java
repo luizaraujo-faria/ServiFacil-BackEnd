@@ -1,8 +1,8 @@
 package com.servifacil.SF_BackEnd.services;
 
-import com.servifacil.SF_BackEnd.dto.UserAddressDTO;
+import com.servifacil.SF_BackEnd.dto.CreateUserDTO;
 import com.servifacil.SF_BackEnd.dto.UserLoginDTO;
-import com.servifacil.SF_BackEnd.dto.UserUpdateDTO;
+import com.servifacil.SF_BackEnd.dto.EditUserDTO;
 import com.servifacil.SF_BackEnd.models.UserModel;
 import com.servifacil.SF_BackEnd.repositories.UserRepository;
 import com.servifacil.SF_BackEnd.exceptions.ApiException;
@@ -26,22 +26,17 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void createUser(UserAddressDTO request) {
+    public void createUser(CreateUserDTO request) {
 
         String email = request.getEmail().trim().toLowerCase();
-        System.out.println("Email recebido: [" + email + "]");
 
         if(userRepository.existsByEmail(email)){
-            System.out.println("Email já cadastrado!");
             throw new ApiException("Email já cadastrado!", HttpStatus.CONFLICT);
         }
 
-        // CONVERTER LocalDate para java.sql.Date
-        java.sql.Date birthDate = java.sql.Date.valueOf(request.getBirthDate());
-        // ✅ CONVERSÃO USANDO O ENUM DA USERMODEL
-//        UserModel.UserType userType = UserModel.UserType.fromString(request.getUserType());
-//        byte userTypeByte = userType.getCode();
-        System.out.println("UserType convertido: " + request.getUserType());
+        if(!MergeUtils.validBirthDate(request.getBirthDate())){
+            throw new ApiException("É necessário ser maior de idade!", HttpStatus.BAD_REQUEST);
+        }
 
         // CRIPTOGRAFIA DA SENHA
         request.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
@@ -54,7 +49,7 @@ public class UserService {
                 request.getRg(),
                 request.getTelephone(),
                 request.getCnpj(),
-                birthDate,
+                request.getBirthDate(),
                 request.getUserType(),
                 request.getProfession(),
                 request.getZipCode(),
@@ -71,7 +66,6 @@ public class UserService {
     public UserModel userLogin(UserLoginDTO request){
 
         String normalizedEmail = request.getEmail().trim().toLowerCase();
-        System.out.println("Email recebido: " + normalizedEmail);
 
         UserModel user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
@@ -85,21 +79,55 @@ public class UserService {
     }
 
     @Transactional
-    public UserModel updateUser(int paramId, UserUpdateDTO request){
+    public UserModel getUser(int userId){
 
-        System.out.println("ID RECEBIDO: " + paramId);
-
-        UserModel existingUser = userRepository.findById(paramId)
+        UserModel user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
+
+        return user;
+    }
+
+    @Transactional
+    public void updateUser(int userId, EditUserDTO request){
+
+        UserModel existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
+
+        String email = request.getEmail().trim().toLowerCase();
+
+        if(userRepository.existsByEmail(email)){
+            throw new ApiException("Email indisponível, use outro!", HttpStatus.CONFLICT);
+        }
 
         if (request == null){
             throw new ApiException("Ao menos um campo deve ser preenchido!", HttpStatus.BAD_REQUEST);
         }
 
+        if(!MergeUtils.validBirthDate(request.getBirthDate())){
+            throw new ApiException("É necessário ser maior de idade!", HttpStatus.BAD_REQUEST);
+        }
+
         request.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
 
-        MergeUtils.mergeNonNullFields(request, existingUser);
-
-        return userRepository.save(existingUser);
+        userRepository.spUpdateUser(
+                userId,
+                request.getUserName(),
+                request.getEmail(),
+                request.getUserPassword(),
+                request.getCpf(),
+                request.getRg(),
+                request.getTelephone(),
+                request.getCnpj(),
+                request.getBirthDate(),
+                request.getUserType(),
+                request.getProfession(),
+                request.getZipCode(),
+                request.getStreet(),
+                request.getHouseNumber(),
+                request.getComplement(),
+                request.getNeighborhood(),
+                request.getCity(),
+                request.getState()
+        );
     }
 }
