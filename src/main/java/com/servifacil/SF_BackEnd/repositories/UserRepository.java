@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserModel, Integer> {
 
     Optional<UserModel> findByEmail(String email);
+
     boolean existsByEmail(String email);
 
     Optional<UserModel> findById(Integer userId);
@@ -29,14 +30,14 @@ public interface UserRepository extends JpaRepository<UserModel, Integer> {
             @Param("vBirth_Date") LocalDate birthDate,
             @Param("vUser_Type") String userType,
             @Param("vProfession") String profession,
+            @Param("vProfile_Photo") String profilePhoto,
             @Param("vZip_Code") String zipCode,
             @Param("vStreet") String street,
             @Param("vHouse_Number") String houseNumber,
             @Param("vComplement") String complement,
             @Param("vNeighborhood") String neighborhood,
             @Param("vCity") String city,
-            @Param("vState") String state
-    );
+            @Param("vState") String state);
 
     @Procedure(procedureName = "spUpdateUser")
     void spUpdateUser(
@@ -51,12 +52,12 @@ public interface UserRepository extends JpaRepository<UserModel, Integer> {
             @Param("vBirth_Date") LocalDate birthDate,
             @Param("vUser_Type") String userType,
             @Param("vProfession") String profession,
+            @Param("vProfile_Photo") String profilePhoto,
             @Param("vZip_Code") String zipCode,
             @Param("vStreet") String street,
             @Param("vHouse_Number") String houseNumber,
             @Param("vComplement") String complement,
             @Param("vNeighborhood") String neighborhood,
             @Param("vCity") String city,
-            @Param("vState") String state
-    );
+            @Param("vState") String state);
 }

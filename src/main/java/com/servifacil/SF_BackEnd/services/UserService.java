@@ -30,11 +30,11 @@ public class UserService {
 
         String email = request.getEmail().trim().toLowerCase();
 
-        if(userRepository.existsByEmail(email)){
+        if (userRepository.existsByEmail(email)) {
             throw new ApiException("Email já cadastrado!", HttpStatus.CONFLICT);
         }
 
-        if(!MergeUtils.validBirthDate(request.getBirthDate())){
+        if (!MergeUtils.validBirthDate(request.getBirthDate())) {
             throw new ApiException("É necessário ser maior de idade!", HttpStatus.BAD_REQUEST);
         }
 
@@ -52,18 +52,18 @@ public class UserService {
                 request.getBirthDate(),
                 request.getUserType(),
                 request.getProfession(),
+                request.getProfilePhoto(),
                 request.getZipCode(),
                 request.getStreet(),
                 request.getHouseNumber(),
                 request.getComplement(),
                 request.getNeighborhood(),
                 request.getCity(),
-                request.getState()
-        );
+                request.getState());
     }
 
     @Transactional
-    public UserModel userLogin(UserLoginDTO request){
+    public UserModel userLogin(UserLoginDTO request) {
 
         String normalizedEmail = request.getEmail().trim().toLowerCase();
 
@@ -71,7 +71,7 @@ public class UserService {
                 .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
         System.out.println("Usuário encontrado no banco: " + user.getUserId() + " - " + user.getEmail());
 
-        if(!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
+        if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())) {
             throw new ApiException("Senha incorreta!", HttpStatus.BAD_REQUEST);
         }
 
@@ -79,7 +79,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserModel getUser(int userId){
+    public UserModel getUser(int userId) {
 
         UserModel user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
@@ -88,46 +88,60 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(int userId, EditUserDTO request){
+    public void updateUser(int userId, EditUserDTO request) {
 
         UserModel existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException("Usuário não encontrado!", HttpStatus.NOT_FOUND));
 
         String email = request.getEmail().trim().toLowerCase();
 
-        if(userRepository.existsByEmail(email)){
+        // Verificar se o email já existe, mas excluir o próprio usuário da verificação
+        UserModel userWithEmail = userRepository.findByEmail(email).orElse(null);
+        if (userWithEmail != null && userWithEmail.getUserId() != userId) {
             throw new ApiException("Email indisponível, use outro!", HttpStatus.CONFLICT);
         }
 
-        if (request == null){
+        if (request == null) {
             throw new ApiException("Ao menos um campo deve ser preenchido!", HttpStatus.BAD_REQUEST);
         }
 
-        if(!MergeUtils.validBirthDate(request.getBirthDate())){
+        // Validar data de nascimento apenas se foi fornecida
+        if (request.getBirthDate() != null && !MergeUtils.validBirthDate(request.getBirthDate())) {
             throw new ApiException("É necessário ser maior de idade!", HttpStatus.BAD_REQUEST);
         }
 
-        request.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
+        // Só criptografar senha se foi fornecida (não vazia)
+        String passwordToSave = existingUser.getUserPassword(); // Manter senha atual por padrão
+        if (request.getUserPassword() != null && !request.getUserPassword().trim().isEmpty()) {
+            passwordToSave = passwordEncoder.encode(request.getUserPassword());
+        }
+        request.setUserPassword(passwordToSave);
 
-        userRepository.spUpdateUser(
-                userId,
-                request.getUserName(),
-                request.getEmail(),
-                request.getUserPassword(),
-                request.getCpf(),
-                request.getRg(),
-                request.getTelephone(),
-                request.getCnpj(),
-                request.getBirthDate(),
-                request.getUserType(),
-                request.getProfession(),
-                request.getZipCode(),
-                request.getStreet(),
-                request.getHouseNumber(),
-                request.getComplement(),
-                request.getNeighborhood(),
-                request.getCity(),
-                request.getState()
-        );
+        try {
+            userRepository.spUpdateUser(
+                    userId,
+                    request.getUserName(),
+                    request.getEmail(),
+                    request.getUserPassword(),
+                    request.getCpf(),
+                    request.getRg(),
+                    request.getTelephone(),
+                    request.getCnpj(),
+                    request.getBirthDate(),
+                    request.getUserType(),
+                    request.getProfession(),
+                    request.getProfilePhoto(),
+                    request.getZipCode(),
+                    request.getStreet(),
+                    request.getHouseNumber(),
+                    request.getComplement(),
+                    request.getNeighborhood(),
+                    request.getCity(),
+                    request.getState());
+        } catch (Exception e) {
+            System.err.println("Erro ao chamar spUpdateUser: " + e.getMessage());
+            e.printStackTrace();
+            throw new ApiException("Erro ao atualizar usuário: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

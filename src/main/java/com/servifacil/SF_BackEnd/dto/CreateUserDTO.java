@@ -25,18 +25,17 @@ public class CreateUserDTO {
     private String userPassword;
 
     @Column(name = "CPF")
-//    @CPF(message = "CPF inválido!")
+    // @CPF(message = "CPF inválido!")
     @Size(min = 11, max = 15, message = "CPF inválido!")
     @NotBlank(message = "CPF é obrigatório!")
     private String cpf;
 
     @Column(name = "CNPJ")
-//    @CNPJ(message = "CNPJ inválido!")
+    // @CNPJ(message = "CNPJ inválido!")
     private String cnpj;
 
     @Column(name = "Telephone")
-    @Pattern(regexp = "^\\(?(\\d{2})\\)?[\\s-]?\\d{4,5}[\\s-]?\\d{4}$",
-            message = "Telefone deve estar no formato (XX) XXXXX-XXXX")
+    @Pattern(regexp = "^\\(?(\\d{2})\\)?[\\s-]?\\d{4,5}[\\s-]?\\d{4}$", message = "Telefone deve estar no formato (XX) XXXXX-XXXX")
     @NotBlank(message = "Número de telefone é obrigatório!")
     private String telephone;
 
@@ -55,6 +54,9 @@ public class CreateUserDTO {
 
     @Column(name = "Profession")
     private String profession;
+
+    @Column(name = "Profile_Photo")
+    private String profilePhoto;
 
     // Dados do endereço
     @Column(name = "Zip_Code")
@@ -120,54 +122,147 @@ public class CreateUserDTO {
     }
 
     // GETTERS E SETTERS (obrigatórios sem Lombok)
-    public String getUserName() { return userName; }
-    public void setUserName(String userName) { this.userName = userName; }
+    public String getUserName() {
+        return userName;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-    public String getUserPassword() { return userPassword; }
-    public void setUserPassword(String userPassword) { this.userPassword = userPassword; }
+    public String getEmail() {
+        return email;
+    }
 
-    public String getCpf() { return cpf; }
-    public void setCpf(String cpf) { this.cpf = cpf; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getRg() { return rg; }
-    public void setRg(String rg) { this.rg = rg; }
+    public String getUserPassword() {
+        return userPassword;
+    }
 
-    public String getTelephone() { return telephone; }
-    public void setTelephone(String telephone) { this.telephone = telephone; }
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
 
-    public String getCnpj() { return cnpj; }
-    public void setCnpj(String cnpj) { this.cnpj = cnpj; }
+    public String getCpf() {
+        return cpf;
+    }
 
-    public LocalDate getBirthDate() { return birthDate; }
-    public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
 
-    public String getUserType() { return userType; }
-    public void setUserType(String userType) { this.userType = userType; }
+    public String getRg() {
+        return rg;
+    }
 
-    public String getProfession() { return profession; }
-    public void setProfession(String profession) { this.profession = profession; }
+    public void setRg(String rg) {
+        this.rg = rg;
+    }
 
-    public String getZipCode() { return zipCode; }
-    public void setZipCode(String zipCode) { this.zipCode = zipCode; }
+    public String getTelephone() {
+        return telephone;
+    }
 
-    public String getStreet() { return street; }
-    public void setStreet(String street) { this.street = street; }
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
 
-    public String getHouseNumber() { return houseNumber; }
-    public void setHouseNumber(String houseNumber) { this.houseNumber = houseNumber; }
+    public String getCnpj() {
+        return cnpj;
+    }
 
-    public String getComplement() { return complement; }
-    public void setComplement(String complement) { this.complement = complement; }
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
+    }
 
-    public String getNeighborhood() { return neighborhood; }
-    public void setNeighborhood(String neighborhood) { this.neighborhood = neighborhood; }
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
 
-    public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
 
-    public String getState() { return state; }
-    public void setState(String state) { this.state = state; }
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getHouseNumber() {
+        return houseNumber;
+    }
+
+    public void setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
+    }
+
+    public String getComplement() {
+        return complement;
+    }
+
+    public void setComplement(String complement) {
+        this.complement = complement;
+    }
+
+    public String getNeighborhood() {
+        return neighborhood;
+    }
+
+    public void setNeighborhood(String neighborhood) {
+        this.neighborhood = neighborhood;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getProfilePhoto() {
+        return profilePhoto;
+    }
+
+    public void setProfilePhoto(String profilePhoto) {
+        this.profilePhoto = profilePhoto;
+    }
 }

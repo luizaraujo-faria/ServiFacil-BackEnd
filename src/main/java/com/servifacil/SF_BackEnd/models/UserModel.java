@@ -47,8 +47,7 @@ public class UserModel {
     private String cnpj;
 
     @Column(name = "Telephone")
-    @Pattern(regexp = "^\\(?(\\d{2})\\)?[\\s-]?\\d{4,5}[\\s-]?\\d{4}$",
-            message = "Telefone deve estar no formato (XX) XXXXX-XXXX")
+    @Pattern(regexp = "^\\(?(\\d{2})\\)?[\\s-]?\\d{4,5}[\\s-]?\\d{4}$", message = "Telefone deve estar no formato (XX) XXXXX-XXXX")
     @NotBlank(message = "Número de telefone é obrigatório!")
     private String telephone;
 
@@ -65,6 +64,9 @@ public class UserModel {
     @Convert(converter = UserTypeConverter.class)
     @Column(name = "User_Type")
     private UserType userType = UserType.Cliente;
+
+    @Column(name = "Profile_Photo", columnDefinition = "LONGTEXT")
+    private String profilePhoto;
 
     @Column(name = "Profession")
     private String profession;
@@ -87,7 +89,6 @@ public class UserModel {
     @OneToMany(mappedBy = "client")
     private List<AssessmentModel> assessments;
 
-
     public enum UserType {
         Cliente("Cliente"),
         Profissional("Profissional");
@@ -104,7 +105,8 @@ public class UserModel {
 
         // Converte texto do banco para Enum
         public static UserType fromDisplayName(String dbValue) {
-            if (dbValue == null) return null;
+            if (dbValue == null)
+                return null;
             for (UserType type : values()) {
                 if (type.displayName.equalsIgnoreCase(dbValue)) {
                     return type;
@@ -116,41 +118,111 @@ public class UserModel {
 
     // GETTERS & SETTERS
 
-    public int getUserId(){ return this.userId; }
+    public int getUserId() {
+        return this.userId;
+    }
 
-    public String getUserName(){ return this.userName; }
-    public void setUserName(String userName){ this.userName = userName; }
+    public String getUserName() {
+        return this.userName;
+    }
 
-    public String getEmail(){ return this.email; }
-    public void setEmail(String email){ this.email = email; }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-    public String getUserPassword(){ return this.userPassword; }
-    public void setUserPassword(String userPassword){ this.userPassword = userPassword; }
+    public String getEmail() {
+        return this.email;
+    }
 
-    public String getCpf(){ return this.cpf; }
-    public void setCpf(String cpf){ this.cpf = cpf; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getCnpj(){ return this.cnpj; }
-    public void setCnpj(String cnpj){ this.cnpj = cnpj; }
+    public String getUserPassword() {
+        return this.userPassword;
+    }
 
-    public String getTelephone(){ return this.telephone; }
-    public void setTelephone(String telephone){ this.telephone = telephone; }
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
 
-    public LocalDate getBirthDate(){ return this.birthDate; }
-    public void setBirthDate(LocalDate birthDate){ this.birthDate = birthDate; }
+    public String getCpf() {
+        return this.cpf;
+    }
 
-    public String getRg(){ return this.rg; }
-    public void setRg(String rg){ this.rg = rg; }
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
 
-    public UserType getUserType(){ return this.userType; }
-    public void setUserType(UserType userType){ this.userType = userType; }
+    public String getCnpj() {
+        return this.cnpj;
+    }
 
-    public String getProfession(){ return this.profession; }
-    public void setProfession(String profession){ this.profession = profession; }
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
+    }
 
-    public AddressModel getAddress(){ return this.address; }
-    public void setAddress(AddressModel address){ this.address = address; }
+    public String getTelephone() {
+        return this.telephone;
+    }
 
-    public LocalDateTime getCreatedAt(){ return this.createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt){ this.createdAt = createdAt; }
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public LocalDate getBirthDate() {
+        return this.birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getRg() {
+        return this.rg;
+    }
+
+    public void setRg(String rg) {
+        this.rg = rg;
+    }
+
+    public UserType getUserType() {
+        return this.userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
+    public String getProfession() {
+        return this.profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public AddressModel getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(AddressModel address) {
+        this.address = address;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getProfilePhoto() {
+        return this.profilePhoto;
+    }
+
+    public void setProfilePhoto(String profilePhoto) {
+        this.profilePhoto = profilePhoto;
+    }
 }

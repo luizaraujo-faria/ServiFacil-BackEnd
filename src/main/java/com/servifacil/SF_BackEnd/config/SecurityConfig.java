@@ -17,6 +17,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -27,15 +29,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final var httpSecurity = http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ← ADICIONE ESTA LINHA
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Adicionado CORS
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
-                        .requestMatchers("/api/services/getall", "/api/services/filter/{category}").authenticated()
-                        .requestMatchers("/api/services/**", "/api/appointments/service/{id}/{serviceId}").hasRole("PROFISSIONAL")
-                        .anyRequest().authenticated()
-                )
+                        .requestMatchers(HttpMethod.GET, "/api/services/getall", "/api/services/filter/**",
+                                "/api/services/{serviceId}")
+                        .authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/services/**").hasRole("PROFISSIONAL")
+                        .requestMatchers(HttpMethod.PATCH, "/api/services/**").hasRole("PROFISSIONAL")
+                        .requestMatchers(HttpMethod.DELETE, "/api/services/**").hasRole("PROFISSIONAL")
+                        .requestMatchers("/api/appointments/service/{id}/{serviceId}").hasRole("PROFISSIONAL")
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -46,25 +52,35 @@ public class SecurityConfig {
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.getWriter().write("{\"error\": \"Acesso permitido apenas para usuários profissionais\"}");
-                        })
-                );
+                            response.getWriter()
+                                    .write("{\"error\": \"Acesso permitido apenas para usuários profissionais\"}");
+                        }));
 
         return http.build();
     }
 
-    // ← ADICIONE ESTE MÉTODO
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
+        // Permite requisições do frontend
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+
+        // Permite todos os métodos HTTP
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+
+        // Permite todos os headers
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        // Permite credenciais (importante para JWT)
         configuration.setAllowCredentials(true);
-        configuration.addAllowedOriginPattern("*");
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
-        configuration.setMaxAge(3600L);
+
+        // Expõe o header Authorization na resposta (útil para JWT)
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 

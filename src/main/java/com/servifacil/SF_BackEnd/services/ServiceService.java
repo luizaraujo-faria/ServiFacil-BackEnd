@@ -32,7 +32,7 @@ public class ServiceService {
     public List<ServiceModel> listAllServices() {
 
         List<ServiceModel> services = serviceRepository.findAll();
-        if(services == null || services.isEmpty()){
+        if (services == null || services.isEmpty()) {
             throw new ApiException("Nenhum serviço foi encontrado!", HttpStatus.NOT_FOUND);
         }
 
@@ -43,11 +43,20 @@ public class ServiceService {
     public List<ServiceModel> filterByCategory(String category) {
 
         List<ServiceModel> services = serviceRepository.findByCategoryCategory(category);
-        if(services == null || services.isEmpty()){
+        if (services == null || services.isEmpty()) {
             throw new ApiException("Nenhum serviço encontrado nesta categoria!", HttpStatus.NOT_FOUND);
         }
 
         return services;
+    }
+
+    @Transactional
+    public ServiceModel getServiceById(int serviceId) {
+
+        ServiceModel service = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new ApiException("Serviço não encontrado!", HttpStatus.NOT_FOUND));
+
+        return service;
     }
 
     @Transactional
@@ -59,8 +68,7 @@ public class ServiceService {
                 request.getPrice(),
                 request.getDetails(),
                 request.getServiceStatus(),
-                request.getCategory()
-        );
+                request.getCategory());
 
         return newService;
     }
@@ -73,18 +81,18 @@ public class ServiceService {
 
         UserModel professional = existingService.getProfessional();
 
-        if(professional == null){
+        if (professional == null) {
             throw new ApiException("Este serviço não tem profissional atribuído!", HttpStatus.NOT_FOUND);
         }
 
-        if(professional.getUserId() != professionalId){
+        if (professional.getUserId() != professionalId) {
             throw new ApiException("Este serviço não pertence a este profissional!", HttpStatus.NOT_FOUND);
         }
 
         CategoryModel existingCategory = categoryRepository.findByCategory(request.getCategory())
                 .orElseThrow(() -> new ApiException("Categoria não existe no sistema!", HttpStatus.NOT_FOUND));
 
-        if(request == null){
+        if (request == null) {
             throw new ApiException("Ao menos um campo deve ser preenchido!", HttpStatus.BAD_REQUEST);
         }
 
@@ -95,8 +103,7 @@ public class ServiceService {
                 request.getPrice(),
                 request.getDetails(),
                 request.getServiceStatus(),
-                request.getCategory()
-        );
+                request.getCategory());
     }
 
     @Transactional
@@ -107,18 +114,18 @@ public class ServiceService {
 
         UserModel professional = existingService.getProfessional();
 
-        if(professional == null){
+        if (professional == null) {
             throw new ApiException("Este serviço não tem profissional atribuído!", HttpStatus.NOT_FOUND);
         }
 
-        if(professional.getUserId() != professionalId){
+        if (professional.getUserId() != professionalId) {
             throw new ApiException("Este serviço não pertence a este profissional!", HttpStatus.NOT_FOUND);
         }
 
         serviceRepository.deleteById(serviceId);
     }
-//    public List<ServiceModel> getServiceByName(String name) {
-//
-//    }
-//
+    // public List<ServiceModel> getServiceByName(String name) {
+    //
+    // }
+    //
 }

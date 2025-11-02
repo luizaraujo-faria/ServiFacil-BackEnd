@@ -34,8 +34,7 @@ public class ServiceController {
         EntityResponse<?> getResponse = new EntityResponse<>(
                 true,
                 "Todos os serviços foram carregados com sucesso!",
-                services
-        );
+                services);
 
         return ResponseEntity.status(HttpStatus.OK).body(getResponse);
     }
@@ -48,8 +47,20 @@ public class ServiceController {
         EntityResponse<?> getResponse = new EntityResponse<>(
                 true,
                 "Todos os serviços filtrados peça categoria " + category + " foram carregados com sucesso!",
-                filteredServices
-        );
+                filteredServices);
+
+        return ResponseEntity.status(HttpStatus.OK).body(getResponse);
+    }
+
+    @GetMapping("/{serviceId}")
+    public ResponseEntity<EntityResponse<?>> getServiceById(@PathVariable int serviceId) {
+
+        ServiceModel service = serviceService.getServiceById(serviceId);
+
+        EntityResponse<?> getResponse = new EntityResponse<>(
+                true,
+                "Serviço carregado com sucesso!",
+                service);
 
         return ResponseEntity.status(HttpStatus.OK).body(getResponse);
     }
@@ -57,9 +68,9 @@ public class ServiceController {
     @PreAuthorize("hasRole('PROFISSIONAL')")
     @PostMapping("/{id}")
     public ResponseEntity<EntityResponse<?>> createService(@PathVariable int id,
-                                      @Valid @RequestBody CreateServiceDTO request,
-                                      BindingResult bindingResult,
-                                      HttpServletRequest servletReq) {
+            @Valid @RequestBody CreateServiceDTO request,
+            BindingResult bindingResult,
+            HttpServletRequest servletReq) {
 
         // Se houver erros de validação, lança ApiException
         if (bindingResult.hasErrors()) {
@@ -72,13 +83,14 @@ public class ServiceController {
 
         Integer idFromToken = (Integer) servletReq.getAttribute("userId");
 
-        if(idFromToken == null){
+        if (idFromToken == null) {
             throw new ApiException("Usuário não autenticado ou token inválido!", HttpStatus.UNAUTHORIZED);
         }
 
-        if(id != idFromToken){
+        if (id != idFromToken) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new EntityResponse<>(false, "Você não tem permissão para criar serviços em outro usuário!", null));
+                    .body(new EntityResponse<>(false, "Você não tem permissão para criar serviços em outro usuário!",
+                            null));
         }
 
         int newServiceId = serviceService.createService(id, request);
@@ -86,18 +98,17 @@ public class ServiceController {
         EntityResponse<?> createResponse = new EntityResponse<>(
                 true,
                 "Serviço criado com sucesso!",
-                newServiceId
-        );
+                newServiceId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createResponse);
     }
 
     @PatchMapping("/{id}/{serviceId}")
     public ResponseEntity<EntityResponse<?>> editService(@PathVariable int id,
-                                                         @PathVariable int serviceId,
-                                                         @Valid @RequestBody EditServiceDTO request,
-                                                         BindingResult bindingResult,
-                                                         HttpServletRequest servletReq) {
+            @PathVariable int serviceId,
+            @Valid @RequestBody EditServiceDTO request,
+            BindingResult bindingResult,
+            HttpServletRequest servletReq) {
 
         // Se houver erros de validação, lança ApiException
         if (bindingResult.hasErrors()) {
@@ -110,40 +121,42 @@ public class ServiceController {
 
         Integer idFromToken = (Integer) servletReq.getAttribute("userId");
 
-        if(idFromToken == null){
+        if (idFromToken == null) {
             throw new ApiException("Usuário não autenticado ou token inválido!", HttpStatus.UNAUTHORIZED);
         }
 
-        if(id != idFromToken){
+        if (id != idFromToken) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new EntityResponse<>(false, "Você não tem permissão para atualizar serviços de outro usuário!", null));
+                    .body(new EntityResponse<>(false,
+                            "Você não tem permissão para atualizar serviços de outro usuário!", null));
         }
 
         serviceService.editService(id, serviceId, request);
 
         EntityResponse<ServiceModel> editResponse = new EntityResponse<>(
                 true,
-                "Serviço do ID: " + serviceId + " Pertencente ao profissional do ID: " + id + " Atualizado com sucesso!",
-                null
-        );
+                "Serviço do ID: " + serviceId + " Pertencente ao profissional do ID: " + id
+                        + " Atualizado com sucesso!",
+                null);
 
         return ResponseEntity.status(HttpStatus.OK).body(editResponse);
     }
 
     @DeleteMapping("/{id}/{serviceId}")
     public ResponseEntity<EntityResponse<?>> deleteService(@PathVariable int id,
-                                                           @PathVariable int serviceId,
-                                                           HttpServletRequest servletReq) {
+            @PathVariable int serviceId,
+            HttpServletRequest servletReq) {
 
         Integer idFromToken = (Integer) servletReq.getAttribute("userId");
 
-        if(idFromToken == null){
+        if (idFromToken == null) {
             throw new ApiException("Usuário não autenticado ou token inválido!", HttpStatus.UNAUTHORIZED);
         }
 
-        if(id != idFromToken){
+        if (id != idFromToken) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new EntityResponse<>(false, "Você não tem permissão para excluir serviços de outro usuário!", null));
+                    .body(new EntityResponse<>(false, "Você não tem permissão para excluir serviços de outro usuário!",
+                            null));
         }
 
         serviceService.deleteService(id, serviceId);
@@ -151,15 +164,14 @@ public class ServiceController {
         EntityResponse<?> deleteResponse = new EntityResponse<>(
                 true,
                 "Serviço do ID: " + serviceId + "excluído com sucesso!",
-                null
-        );
+                null);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(deleteResponse);
     }
 
-//
-//    @GetMapping("/buscar/nome/{nome}")
-//    public List<ServiceModel> buscarPorNome(@PathVariable String name) {
-//        return service.buscarPorNome(name);
-//    }
+    //
+    // @GetMapping("/buscar/nome/{nome}")
+    // public List<ServiceModel> buscarPorNome(@PathVariable String name) {
+    // return service.buscarPorNome(name);
+    // }
 }

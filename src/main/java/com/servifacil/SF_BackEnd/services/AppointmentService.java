@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,17 +32,17 @@ public class AppointmentService {
                 .filter(s -> "Ativo".equalsIgnoreCase(s.getServiceStatus().getDisplayName().trim()))
                 .orElseThrow(() -> new ApiException("Serviço não econtrado para agendamento!", HttpStatus.NOT_FOUND));
 
-        boolean conflictDates = appointmentRepository.existsByService_ServiceIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-          serviceId,
-          request.getEndDate(),
-          request.getStartDate()
-        );
+        boolean conflictDates = appointmentRepository
+                .existsByService_ServiceIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                        serviceId,
+                        request.getEndDate(),
+                        request.getStartDate());
 
-        if(request.getEndDate().isBefore(request.getStartDate()) || request.equals(request.getStartDate())){
+        if (request.getEndDate().isBefore(request.getStartDate()) || request.equals(request.getStartDate())) {
             throw new ApiException("Data de término deve ser maior que a de início!", HttpStatus.BAD_REQUEST);
         }
 
-        if(conflictDates){
+        if (conflictDates) {
             throw new ApiException("Horário indisponível para este serviço!", HttpStatus.CONFLICT);
         }
 
@@ -50,8 +51,7 @@ public class AppointmentService {
                 serviceId,
                 request.getStartDate(),
                 request.getEndDate(),
-                AppointmentModel.AppointmentStatus.Pendente.getDisplayName()
-        );
+                AppointmentModel.AppointmentStatus.Pendente.getDisplayName());
 
         return newAppointment;
     }
@@ -60,12 +60,11 @@ public class AppointmentService {
     @Transactional
     public List<AppointmentModel> getAppointmentsByUser(int clientId, String apStatus) {
 
-        List<AppointmentModel> userAppointments = appointmentRepository.findAllAppointmentByUserByStatus(clientId, apStatus);
-        if(userAppointments == null || userAppointments.isEmpty()){
-            throw new ApiException("Nenhum agendamento encontrado!", HttpStatus.NOT_FOUND);
-        }
+        List<AppointmentModel> userAppointments = appointmentRepository.findAllAppointmentByUserByStatus(clientId,
+                apStatus);
 
-        return userAppointments;
+        // Retornar lista vazia se não houver agendamentos (em vez de lançar exceção)
+        return userAppointments != null ? userAppointments : new ArrayList<>();
     }
 
     // Buscar agendamentos por serviço
@@ -78,12 +77,11 @@ public class AppointmentService {
             throw new ApiException("Este serviço pertence a outro profissional!", HttpStatus.CONFLICT);
         }
 
-        List<AppointmentModel> serviceAppointments = appointmentRepository.findAllAppointmentByServiceByStatus(serviceId, apStatus);
-        if (serviceAppointments == null || serviceAppointments.isEmpty()) {
-            throw new ApiException("Nenhum agendamento encontrado para este serviço!", HttpStatus.NOT_FOUND);
-        }
+        List<AppointmentModel> serviceAppointments = appointmentRepository
+                .findAllAppointmentByServiceByStatus(serviceId, apStatus);
 
-        return serviceAppointments;
+        // Retornar lista vazia se não houver agendamentos (em vez de lançar exceção)
+        return serviceAppointments != null ? serviceAppointments : new ArrayList<>();
     }
 
     // Cancelar agendamento
@@ -93,11 +91,24 @@ public class AppointmentService {
                 .filter(a -> "Pendente".equalsIgnoreCase(a.getAppointmentStatus().getDisplayName()))
                 .orElseThrow(() -> new ApiException("Agendamento não encontrado!", HttpStatus.NOT_FOUND));
 
-        if(existingAppointment.getClient().getUserId() != clientId){
+        if (existingAppointment.getClient().getUserId() != clientId) {
             throw new ApiException("Este agendamento não pertence a você!", HttpStatus.CONFLICT);
         }
 
-        return appointmentRepository.updateAppointmentStatus(appointmentId, AppointmentModel.AppointmentStatus.Cancelado.getDisplayName());
+        return appointmentRepository.updateAppointmentStatus(appointmentId,
+                AppointmentModel.AppointmentStatus.Cancelado.getDisplayName());
+    }
+
+    // Verificar se o usuário é o profissional dono do serviço do agendamento
+    public boolean isProfessionalOwner(int professionalId, int appointmentId) {
+        AppointmentModel appointment = appointmentRepository.findById(appointmentId)
+                .orElse(null);
+
+        if (appointment == null || appointment.getService() == null) {
+            return false;
+        }
+
+        return appointment.getService().getProfessional().getUserId() == professionalId;
     }
 
     // Completar agendamento
@@ -107,47 +118,54 @@ public class AppointmentService {
                 .filter(a -> "Pendente".equalsIgnoreCase(a.getAppointmentStatus().getDisplayName()))
                 .orElseThrow(() -> new ApiException("Agendamento não encontrado!", HttpStatus.NOT_FOUND));
 
-        if(existingAppointment.getClient().getUserId() != clientId){
+        if (existingAppointment.getClient().getUserId() != clientId) {
             throw new ApiException("Este agendamento não pertence a você!", HttpStatus.CONFLICT);
         }
 
-        return appointmentRepository.updateAppointmentStatus(appointmentId, AppointmentModel.AppointmentStatus.Concluido.getDisplayName());
+        return appointmentRepository.updateAppointmentStatus(appointmentId,
+                AppointmentModel.AppointmentStatus.Concluido.getDisplayName());
     }
 
-
-//
-//    // Atualizar agendamento
-//    public AppointmentModel updateAppointment(int appointmentId, AppointmentDTO appointmentDTO) {
-//        Optional<AppointmentModel> appointmentOpt = appointmentRepository.findById(appointmentId);
-//        if (appointmentOpt.isEmpty()) {
-//            throw new RuntimeException("Agendamento não encontrado!");
-//        }
-//
-//        AppointmentModel appointment = appointmentOpt.get();
-//
-//        // Validar se pode editar (apenas agendamentos pendentes)
-//        if (appointment.getAppointmentStatus() != AppointmentModel.AppointmentStatus.PENDING) {
-//            throw new RuntimeException("Somente agendamentos pendentes podem ser editados!");
-//        }
-//
-//        // Validar nova data se for diferente
-//        if (!appointment.getAppointmentDate().equals(appointmentDTO.getAppointmentDate())) {
-//            // Validar disponibilidade do novo horário
-//            List<AppointmentModel> existingAppointments = appointmentRepository.findExistingAppointments(
-//                    appointmentDTO.getServiceId(),
-//                    appointmentDTO.getAppointmentDate()
-//            );
-//
-//            if (!existingAppointments.isEmpty()) {
-//                throw new RuntimeException("Já existe um agendamento para este horário!");
-//            }
-//
-//            appointment.setAppointmentDate(appointmentDTO.getAppointmentDate());
-//        }
-//
-//        appointment.setServiceId(appointmentDTO.getServiceId());
-//
-//        return appointmentRepository.save(appointment);
-//    }
-//
+    //
+    // // Atualizar agendamento
+    // public AppointmentModel updateAppointment(int appointmentId, AppointmentDTO
+    // appointmentDTO) {
+    // Optional<AppointmentModel> appointmentOpt =
+    // appointmentRepository.findById(appointmentId);
+    // if (appointmentOpt.isEmpty()) {
+    // throw new RuntimeException("Agendamento não encontrado!");
+    // }
+    //
+    // AppointmentModel appointment = appointmentOpt.get();
+    //
+    // // Validar se pode editar (apenas agendamentos pendentes)
+    // if (appointment.getAppointmentStatus() !=
+    // AppointmentModel.AppointmentStatus.PENDING) {
+    // throw new RuntimeException("Somente agendamentos pendentes podem ser
+    // editados!");
+    // }
+    //
+    // // Validar nova data se for diferente
+    // if
+    // (!appointment.getAppointmentDate().equals(appointmentDTO.getAppointmentDate()))
+    // {
+    // // Validar disponibilidade do novo horário
+    // List<AppointmentModel> existingAppointments =
+    // appointmentRepository.findExistingAppointments(
+    // appointmentDTO.getServiceId(),
+    // appointmentDTO.getAppointmentDate()
+    // );
+    //
+    // if (!existingAppointments.isEmpty()) {
+    // throw new RuntimeException("Já existe um agendamento para este horário!");
+    // }
+    //
+    // appointment.setAppointmentDate(appointmentDTO.getAppointmentDate());
+    // }
+    //
+    // appointment.setServiceId(appointmentDTO.getServiceId());
+    //
+    // return appointmentRepository.save(appointment);
+    // }
+    //
 }
