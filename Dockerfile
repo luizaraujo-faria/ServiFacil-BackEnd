@@ -21,4 +21,4 @@ RUN ./mvnw clean package -DskipTests
 EXPOSE 8080
 
 # Comando para rodar o app
-ENTRYPOINT ["java", "-jar", "target/ServiFacil-BackEnd-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "target/SF-BackEnd-0.0.1-SNAPSHOT.jar"]
