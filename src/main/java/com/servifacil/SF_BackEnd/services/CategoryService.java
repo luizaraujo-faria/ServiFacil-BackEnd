@@ -1,5 +1,6 @@
 package com.servifacil.SF_BackEnd.services;
 
+import com.servifacil.SF_BackEnd.dto.CreateCategoryDTO;
 import com.servifacil.SF_BackEnd.exceptions.ApiException;
 import com.servifacil.SF_BackEnd.models.CategoryModel;
 import com.servifacil.SF_BackEnd.repositories.CategoryRepository;
@@ -25,5 +26,18 @@ public class CategoryService {
         }
 
         return categories;
+    }
+
+    public CategoryModel createCategory(CreateCategoryDTO request){
+
+        CategoryModel existingCategory = categoryRepository.findByCategory(request.getCategory())
+                .orElseThrow(() -> new ApiException("Categoria já existe", HttpStatus.CONFLICT));
+
+        categoryRepository.spInsertCategory(
+                request.getCategory(),
+                request.getDetails()
+        );
+
+        return existingCategory;
     }
 }
